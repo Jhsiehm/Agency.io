@@ -1,0 +1,1481 @@
+<title>Agency.io</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Ubuntu:wght@700&display=swap">
+<style>
+/* Layout: one desk, two worlds. Dark observation console (rail | arena | dossier) wrapped around a bright Agar-style feed. */
+:root{
+  --desk:#0c1210; --panel:#0f1614; --panel-2:#131c19; --line:#1f2b27; --line-2:#2a3833;
+  --ink:#dfe7e3; --ink-2:#a9b6b1; --dim:#6f7d78;
+  --cyan:#5fd4c6; --amber:#f2b45a; --split:#d58fd6; --danger:#e07a6a;
+  --floor:#f8f6ef; --grid:#e4e1d8;
+  --f-ui:"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --f-cell:"Ubuntu", "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--desk);color:var(--ink);font:13px/1.4 var(--f-ui);overflow:hidden;
+  padding-left:max(0px, env(safe-area-inset-left,0px));padding-right:max(0px, env(safe-area-inset-right,0px))}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+a{color:var(--cyan)}
+.mono{font-family:var(--f-mono)}
+.ic{width:14px;height:14px;flex:none;display:inline-block;vertical-align:-2.5px;overflow:visible}
+.ic.sm{width:12px;height:12px;vertical-align:-2px}
+.btn,.tabs button,.tp button,#replay,.notice .x,.notice .watch{display:inline-flex;align-items:center;gap:7px}
+h2 .ic{margin-right:7px;vertical-align:-2px}
+.seg{display:inline-flex;border:1px solid var(--line-2);background:#0e1513}
+.seg>*{border:0!important;border-right:1px solid var(--line-2)!important}
+.seg>*:last-child{border-right:0!important}
+.lbl{font:500 10.5px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.lbl.c{color:var(--cyan)} .lbl.a{color:var(--amber)}
+#app{display:grid;height:100%;grid-template-columns:200px minmax(0,1fr) 360px;grid-template-rows:46px minmax(0,1fr) 28px;
+  grid-template-areas:"hd hd hd" "rail main dos" "ft ft ft"}
+header{grid-area:hd;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--desk)}
+.brand{display:flex;align-items:center;gap:10px;font:600 15px var(--f-ui);letter-spacing:.06em}
+.brand .sep{width:1px;height:20px;background:var(--line-2)}
+.brand .logo{height:24px;width:auto;display:block}
+.brand .prod{font-weight:400;letter-spacing:.01em;font-size:16px}
+header .mid{flex:1;display:flex;justify-content:center;gap:36px}
+header .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-right:7px;vertical-align:1px}
+aside,main{min-width:0;min-height:0}
+#rail{grid-area:rail;border-right:1px solid var(--line);padding:14px 12px;display:flex;flex-direction:column;gap:10px;overflow:auto}
+#rail h2,#dossier h2{margin:0;font:500 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+.obs-title{font:600 15px var(--f-ui);margin-top:2px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.obs-tabs{display:flex;gap:4px}
+.obs-tabs button{font:500 10px var(--f-mono);padding:2px 6px;display:inline-flex;align-items:center;border:1px solid var(--line-2);color:var(--dim)}
+.obs-tabs button[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
+.obs-tabs button:disabled{opacity:.35;cursor:default}
+.slot{display:flex;flex-direction:column;gap:4px}
+.slot .frame{width:100%;aspect-ratio:16/9;border:1px solid var(--line-2);background:repeating-linear-gradient(90deg,#111a17 0 9px,#0f1715 9px 18px);display:grid;place-items:center;overflow:hidden;position:relative}
+.slot .frame img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:auto}
+.slot .frame .await{font:500 9.5px var(--f-mono);letter-spacing:.08em;color:var(--dim)}
+.slot button.frame{cursor:pointer}
+.slot button.frame:hover{border-color:var(--cyan)}
+.slot.current .frame{border-color:var(--amber)}
+.slot .meta{display:flex;justify-content:space-between;font:400 11px var(--f-mono)}
+.slot .meta .st{color:var(--cyan);font-size:9.5px;letter-spacing:.08em;display:inline-flex;gap:4px;align-items:center}
+.slot .meta .st.pend{color:var(--dim)}
+.exhibit{border-top:1px solid var(--line);padding-top:10px;margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.exhibit .row{display:flex;gap:10px;align-items:flex-start;text-align:left}
+.exhibit canvas{width:72px;height:72px;image-rendering:pixelated;border:1px solid var(--line-2);flex:none}
+.exhibit .big{font:600 15px var(--f-ui)}
+main#center{grid-area:main;display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.tabs{display:flex;align-items:center;gap:6px;padding:8px 10px;height:42px}
+.tabs button{font:400 12px var(--f-mono);padding:5px 12px;color:var(--ink-2)}
+.tabs button:hover{color:var(--ink);background:#141e1b}
+.tabs button[aria-selected="true"]{color:var(--amber);background:#1a1710;box-shadow:inset 0 -2px 0 var(--amber)}
+.tabs .sp{flex:1}
+#stage{position:relative;flex:1;min-height:0;margin:0 10px;border:1px solid var(--line-2);background:var(--floor);overflow:hidden}
+#arena{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#arena.dragging{cursor:grabbing}
+.chip{position:absolute;left:10px;top:10px;background:#0f1a17;color:var(--cyan);font:500 11px var(--f-mono);letter-spacing:.06em;padding:5px 12px;border:1px solid #213a34;pointer-events:none}
+.chip .ic{margin-right:8px}
+.datestamp .ic{margin-right:7px}
+.datestamp{position:absolute;right:10px;top:10px;background:rgba(15,26,23,.86);color:var(--amber);font:500 11px var(--f-mono);letter-spacing:.06em;padding:5px 10px;pointer-events:none}
+.notice{max-width:min(380px,calc(100% - 32px));position:absolute;right:16px;bottom:16px;background:#1d2a28;border:1px solid #2f4440;color:var(--ink);padding:10px 12px 12px 14px;min-width:270px;box-shadow:0 6px 18px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:6px}
+.notice .top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.notice .watch{font:600 14.5px/1.3 var(--f-ui);text-align:left;display:flex;gap:10px;align-items:center}
+.notice .watch:hover{color:var(--cyan)}
+.notice .x{font:500 10.5px var(--f-mono);color:var(--ink-2);border:1px solid var(--line-2);padding:2px 7px}
+.notice .more{font:400 11px var(--f-mono);color:var(--dim)}
+.card{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:#101a17;border:1px solid var(--amber);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:300px;max-width:calc(100% - 32px)}
+.card .t{font:600 15px var(--f-ui)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:500 12px var(--f-mono);padding:6px 11px;border:1px solid var(--line-2);color:var(--ink);background:#141e1b}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn.amber{border-color:var(--amber);color:var(--amber);background:#1a1710}
+.btn.cyan{border-color:var(--cyan);color:var(--cyan)}
+#start{position:absolute;inset:0;display:grid;place-items:center;background:rgba(248,246,239,.35);pointer-events:none}
+#start button{pointer-events:auto;font:600 17px var(--f-ui);background:#0f1715;color:var(--ink);border:1px solid var(--amber);padding:13px 22px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#start button .tri{color:var(--amber)}
+.ws{position:absolute;inset:0;background:var(--panel);color:var(--ink);overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.ws h3{margin:0;font:600 16px var(--f-ui)}
+.ws table{border-collapse:collapse;width:100%;font-size:12.5px}
+.ws th{font:500 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line-2)}
+.ws td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.ws input{background:#0b110f;border:1px solid var(--line-2);color:var(--ink);font:13px var(--f-mono);padding:6px 9px;width:min(320px,100%)}
+.tag{font:500 10px var(--f-mono);letter-spacing:.06em;padding:1px 6px;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap}
+.kv .tag{white-space:normal;display:inline-block}
+.kv dd{min-width:0;overflow-wrap:anywhere}
+.ws .acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.tag.on{border-color:var(--cyan);color:var(--cyan)} .tag.off{color:var(--dim)} .tag.amb{border-color:var(--amber);color:var(--amber)}
+#transport{display:flex;align-items:center;gap:14px;height:52px;padding:0 10px;margin:0 10px;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
+#transport .vsep{width:1px;height:24px;background:var(--line-2);flex:none}
+#owner{display:flex;gap:6px;flex:none}
+#owner .btn{white-space:nowrap}
+.playhead{display:flex;align-items:baseline;gap:10px;flex:none}
+.playhead .yr{font:600 22px var(--f-mono);color:var(--amber);font-variant-numeric:tabular-nums}
+.playhead .full{font:400 11px var(--f-mono);color:var(--ink-2);min-width:88px}
+.tp{display:flex;gap:4px;flex:none}
+.tp button{width:32px;height:30px;border:1px solid var(--line-2);display:grid;place-items:center;font:500 13px var(--f-mono)}
+.tp button.play{width:auto;padding:0 12px;border-color:var(--amber);color:var(--amber);gap:8px;display:flex;align-items:center}
+.tp button:hover{border-color:var(--cyan)}
+#speed{flex:none;align-items:stretch}
+#speed .seg-l{display:inline-flex;align-items:center;gap:6px;padding:0 8px;font:500 10.5px var(--f-mono);letter-spacing:.08em;color:var(--dim)}
+#speed button{font:500 11.5px var(--f-mono);padding:5px 8px;color:var(--ink-2)}
+#speed button[aria-pressed="true"]{color:var(--cyan);background:#10201d}
+#speedBtn{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 9px;border:1px solid var(--line-2);background:#0e1513;font:500 11.5px var(--f-mono);color:var(--ink-2)}
+#speedBtn .seg-l{font:500 10.5px var(--f-mono);letter-spacing:.08em;color:var(--dim)}
+#speedBtn b{color:var(--cyan);font-weight:500;min-width:34px;text-align:left}
+#speedBtn[aria-expanded="true"]{border-color:var(--cyan)}
+#speedMenu{position:fixed;z-index:30;background:#0f1715;border:1px solid var(--cyan);padding:4px;display:flex;flex-direction:column;min-width:220px;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+#speedMenu button{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:7px 10px;font:500 12px var(--f-mono);color:var(--ink-2);text-align:left}
+#speedMenu button .d{font:400 11px var(--f-ui);color:var(--dim)}
+#speedMenu button:hover{background:#141e1b;color:var(--ink)}
+#speedMenu button[aria-checked="true"]{color:var(--cyan);background:#10201d}
+#speedMenu .hd{font:500 10px var(--f-mono);letter-spacing:.08em;color:var(--dim);padding:5px 10px 3px}
+#tour button{font:500 11.5px var(--f-mono);padding:5px 10px;color:var(--ink-2);display:inline-flex;gap:7px;align-items:center;white-space:nowrap}
+#tour button[aria-pressed="true"]{color:var(--amber);background:#1a1710}
+#tour button:hover{color:var(--ink)}
+#replay{font:500 12px var(--f-mono);color:var(--cyan);letter-spacing:.06em;flex:none;margin-left:auto;border:1px solid #23413b;padding:5px 10px}
+#replay.hot{color:#0c1210;background:var(--cyan);border-color:var(--cyan)}
+#timeline{padding:10px 20px 10px;margin:0 10px;display:flex;flex-direction:column;gap:6px}
+.tl-head{display:flex;justify-content:space-between;align-items:baseline}
+.tl-head h3{margin:0;font:600 15px var(--f-ui)}
+#tl{position:relative;height:84px;margin-left:120px;margin-right:12px;touch-action:none;cursor:pointer}
+#tl .axis{position:absolute;left:0;right:0;top:0;height:16px}
+#tl .yr{position:absolute;top:0;transform:translateX(-50%);font:400 10.5px var(--f-mono);color:var(--ink-2)}
+#tl .lane{position:absolute;left:0;right:0;height:1px;background:var(--line-2)}
+#tl .lane-l{position:absolute;left:-120px;display:inline-flex;gap:6px;align-items:center;font:500 10.5px var(--f-mono);letter-spacing:.06em;transform:translateY(-50%)}
+#tl .tick{position:absolute;width:1px;height:6px;background:var(--line-2);transform:translate(-50%,-50%)}
+#tl .mk{position:absolute;width:13px;height:13px;transform:translate(-50%,-50%) rotate(45deg);border:0;padding:0}
+#tl .mk.inc{background:var(--cyan)} #tl .mk.spl{background:var(--split)}
+#tl .mk.future{opacity:.45}
+#tl .mk:hover{outline:2px solid var(--amber)}
+#tl .ph{position:absolute;top:16px;bottom:0;width:1px;background:var(--amber);pointer-events:none}
+#tl .ph::before{content:"";position:absolute;top:-6px;left:-5px;border:5px solid transparent;border-top:6px solid var(--amber)}
+.onrec{display:flex;gap:22px;align-items:baseline;min-height:22px}
+.onrec .t{font:600 15px var(--f-ui)}
+.onrec .ph-tag{font:400 11px var(--f-mono);color:var(--ink-2)}
+#dossier{grid-area:dos;display:flex;flex-direction:column;min-height:0;overflow:auto}
+.dsec{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.dhead{display:flex;justify-content:space-between;align-items:center}
+.ent{display:flex;gap:14px;align-items:center}
+.ent canvas{width:56px;height:56px;flex:none}
+.ent .short{font:600 20px/1.2 var(--f-ui);letter-spacing:.005em;text-wrap:balance}
+.long{font:400 11px var(--f-mono)!important;color:var(--dim)!important;letter-spacing:.04em}
+.own-t{max-width:240px;white-space:normal;line-height:1.2;text-align:left}
+.ent .long{color:var(--ink);font-size:13.5px}
+.kv{display:grid;grid-template-columns:92px 1fr;gap:3px 10px;font-size:12px}
+.kv dt{font:500 10px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--dim);padding-top:2px}
+.kv dd{margin:0;color:var(--ink-2)}
+.expl{color:var(--ink-2);font-size:12.5px;margin:0}
+#linSvg{width:100%;height:auto;display:block}
+#lineage .node{cursor:pointer}
+#lineage .node:hover rect{stroke:var(--cyan)}
+#mini{width:100%;height:auto;aspect-ratio:3.2/1.2;display:block;border:1px solid var(--line-2);cursor:crosshair;background:#111a17}
+#log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:12.5px;max-height:220px;overflow:auto}
+#log li{display:grid;grid-template-columns:12px 44px 1fr;gap:6px;align-items:baseline;color:var(--ink-2)}
+#log li .d{margin-top:1px;width:7px;height:7px;transform:rotate(45deg);background:var(--cyan);display:inline-block}
+#log li.sys .d{background:transparent;border:1px solid var(--dim)}
+#log li.sys{color:var(--dim)}
+#log li:last-child{color:var(--ink)}
+#log .ts{font:400 11px var(--f-mono);color:var(--dim)}
+footer{grid-area:ft;display:flex;align-items:center;gap:24px;padding:0 16px;border-top:1px solid var(--line);font:400 10px var(--f-mono);letter-spacing:.08em;color:var(--dim);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+footer .r{margin-left:auto;color:var(--cyan)}
+#drawer{position:fixed;top:46px;right:0;bottom:28px;width:min(460px,100%);background:#0f1715;border-left:1px solid var(--amber);z-index:20;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:-10px 0 30px rgba(0,0,0,.35)}
+#drawer h3{margin:0;font:600 17px var(--f-ui)}
+#drawer .src{border:1px solid var(--line-2);padding:10px;display:flex;flex-direction:column;gap:4px}
+#drawer .src .st{font:500 10px var(--f-mono);color:var(--cyan);letter-spacing:.06em}
+#drawer blockquote{margin:2px 0;padding-left:10px;border-left:2px solid var(--line-2);color:var(--ink-2);font-size:12.5px}
+#drawer canvas.xl{width:240px;height:240px;image-rendering:pixelated;border:1px solid var(--line-2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.mobile-only{display:none}
+@media (max-width:1560px){ .playhead .lbl{display:none} #speed .seg-l{font-size:0;gap:0} }
+@media (max-width:1380px){ .playhead .full{display:none} #tour .yrs{display:none} }
+@media (max-width:1180px){
+  #app{grid-template-columns:minmax(0,1fr) 330px;grid-template-areas:"hd hd" "main dos" "ft ft"}
+  #rail{position:fixed;left:0;top:46px;bottom:28px;width:220px;z-index:15;background:var(--desk);display:none;border-right:1px solid var(--amber)}
+  #rail.open{display:flex}
+  .mobile-only.sheet-rail{display:inline-flex}
+}
+@media (max-width:820px){
+  #app{grid-template-columns:minmax(0,1fr);grid-template-rows:46px minmax(0,1fr) 0;grid-template-areas:"hd" "main" "ft"}
+  header .mid{display:none}
+  #dossier{position:fixed;left:0;right:0;bottom:0;height:60%;z-index:16;background:var(--desk);border-top:1px solid var(--amber);display:none}
+  #dossier.open{display:flex}
+  .mobile-only{display:inline-flex}
+  #timeline{padding:6px 10px}
+  #tl{margin-left:96px}
+  #tl .lane-l{left:-96px;font-size:9.5px}
+  .onrec .ph-tag{display:none}
+  footer{display:none}
+  #stage{margin:0 6px}
+  #transport{gap:10px;margin:0 6px}
+  .playhead .full{display:none}
+  .playhead .lbl{display:none}
+  .tp{order:-1}
+  #tl .yr.minor{display:none}
+  header .brand .prod{display:none}
+  header .brand .sep{display:none}
+  .brand .logo{height:20px}
+  .tabs .lbl{display:none}
+  #tour .yrs{display:none}
+  #speedBtn .seg-l{display:none}
+  .tabs{height:auto;flex-wrap:wrap;row-gap:6px}
+  .tabs .sp{display:none}
+  #tour{width:100%}
+  #tour button{flex:1;justify-content:center}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="i-plus" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M8 3v10M3 8h10"/></symbol><symbol id="i-caret" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M4.5 6.5 8 10l3.5-3.5"/></symbol><symbol id="i-rewind" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M8 4 3 8l5 4zM14 4 9 8l5 4z"/></symbol><symbol id="i-history" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 8a5 5 0 1 0 1.5-3.6"/><path d="M2.5 2.5v2.6h2.6"/><path d="M8 5v3.2l2.2 1.4"/></symbol><symbol id="i-grid" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2.5 2.5h4.5v4.5H2.5zM9 2.5h4.5v4.5H9zM2.5 9h4.5v4.5H2.5zM9 9h4.5v4.5H9z"/></symbol><symbol id="i-target" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="8" cy="8" r="4.6"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/><circle cx="8" cy="8" r="1" fill="currentColor" stroke="none"/></symbol><symbol id="i-branch" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="3.5" cy="8" r="1.6"/><circle cx="12.5" cy="3.5" r="1.6"/><circle cx="12.5" cy="12.5" r="1.6"/><path d="M5.1 8H8V3.5h2.9M8 8v4.5h2.9"/></symbol><symbol id="i-doc" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M3.5 1.5h6l3 3v10h-9z"/><path d="M9.5 1.5v3h3M5.5 7.5h5M5.5 10h5M5.5 12.5h3"/></symbol><symbol id="i-signal" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="8" cy="10" r="1.2" fill="currentColor" stroke="none"/><path d="M5.2 7.6a4 4 0 0 1 5.6 0M3.2 5.4a7 7 0 0 1 9.6 0"/></symbol><symbol id="i-monitor" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M1.5 2.5h13v8.5h-13zM6 14h4M8 11v3"/></symbol><symbol id="i-play" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M4.5 2.5l9 5.5-9 5.5z" fill="currentColor" stroke="none"/></symbol><symbol id="i-pause" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M4 2.5h2.6v11H4zM9.4 2.5H12v11H9.4z" fill="currentColor" stroke="none"/></symbol><symbol id="i-prev" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 2.5v11"/><path d="M13 2.5l-8 5.5 8 5.5z" fill="currentColor" stroke="none"/></symbol><symbol id="i-next" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M13 2.5v11"/><path d="M3 2.5l8 5.5-8 5.5z" fill="currentColor" stroke="none"/></symbol><symbol id="i-replay" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 8a5 5 0 1 0 1.5-3.6"/><path d="M2.5 1.8v3.4h3.4"/></symbol><symbol id="i-gauge" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 11.5a6 6 0 0 1 12 0"/><path d="M8 11.5l3-4.2"/><path d="M2 13.5h12"/></symbol><symbol id="i-route" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="3" cy="12.5" r="1.5"/><circle cx="13" cy="3.5" r="1.5"/><path d="M4.5 12.5h4a2.2 2.2 0 0 0 0-4.4h-1a2.2 2.2 0 0 1 0-4.4H11.5" stroke-dasharray="2 1.4"/></symbol><symbol id="i-lock" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M1.5 5V1.5H5M11 1.5h3.5V5M14.5 11v3.5H11M5 14.5H1.5V11"/><circle cx="8" cy="8" r="2" fill="currentColor" stroke="none"/></symbol><symbol id="i-close" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></symbol><symbol id="i-move" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M8 1.5v13M1.5 8h13M8 1.5L6 3.5M8 1.5l2 2M8 14.5l-2-2M8 14.5l2-2M1.5 8l2-2M1.5 8l2 2M14.5 8l-2-2M14.5 8l-2 2"/></symbol><symbol id="i-return" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M13.5 3v4.5a2.5 2.5 0 0 1-2.5 2.5H3"/><path d="M6 7l-3 3 3 3"/></symbol><symbol id="i-eye" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M1 8s2.6-4.5 7-4.5S15 8 15 8s-2.6 4.5-7 4.5S1 8 1 8z"/><circle cx="8" cy="8" r="2"/></symbol><symbol id="i-radar" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="3"/><path d="M8 8l4.4-4.4"/><circle cx="11" cy="10.5" r=".9" fill="currentColor" stroke="none"/></symbol><symbol id="i-arrow" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 8h11M9 4l4 4-4 4"/></symbol><symbol id="i-external" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M9.5 2h4.5v4.5M14 2L7.5 8.5M12 9.5v4.5H2V4h4.5"/></symbol><symbol id="i-check" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2.5 8.5l3.5 3.5 7.5-8"/></symbol><symbol id="i-pending" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="8" cy="8" r="5.5" stroke-dasharray="2 2"/></symbol><symbol id="i-frames" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M1.5 4h10v8.5h-10zM4.5 4V1.5h10V10h-3"/><path d="M1.5 10l3-3 3 3 2-2 2 2"/></symbol><symbol id="i-lens" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.3 10.3l4.2 4.2"/></symbol><symbol id="i-idcard" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M1.5 3h13v10h-13z"/><circle cx="5.5" cy="7.2" r="1.7"/><path d="M3 11c.6-1.4 4.4-1.4 5 0M10 6h3M10 8.5h3"/></symbol><symbol id="i-map" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M1.5 3.5l4-1.5 5 1.8 4-1.5v10.2l-4 1.5-5-1.8-4 1.5z"/><path d="M5.5 2v10.2M10.5 3.8V14"/></symbol><symbol id="i-clock" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.8"/></symbol><symbol id="i-merge" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 3.5h4l3 4.5h5M2 12.5h4l3-4.5"/><path d="M11.5 5.5L14 8l-2.5 2.5"/></symbol><symbol id="i-fork" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 8h5l3-4.5h4M7 8l3 4.5h4"/><path d="M12 1.5l2 2-2 2M12 10.5l2 2-2 2"/></symbol><symbol id="i-aperture" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="8" cy="8" r="6"/><path d="M8 2l2.2 6M14 8l-6 2.2M8 14l-2.2-6M2 8l6-2.2"/></symbol><symbol id="i-calendar" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 3.5h12v10.5H2zM2 6.5h12M5 1.5v3M11 1.5v3"/><path d="M5 9h2v2H5z" fill="currentColor" stroke="none"/></symbol><symbol id="i-skip" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 8h8.5M7.5 4.5L11 8l-3.5 3.5M13.5 3v10"/></symbol><symbol id="i-search" viewBox="0 0 16 16" stroke="currentColor" fill="none" stroke-width="1.3" stroke-linecap="square" stroke-linejoin="miter"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.3 10.3l4.2 4.2"/></symbol></defs></svg>
+<div id="app">
+  <header>
+    <div class="brand">
+      <img class="logo" src="data:image/png;base64,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" width="160" height="32" alt="Statecraft"><span class="sep"></span><span class="prod">Agency.io</span>
+    </div>
+    <div class="mid"><span class="lbl">Observation desk</span><span class="lbl c"><svg class="ic" aria-hidden="true"><use href="#i-signal"/></svg> Archive connected · <span id="dsv"></span></span></div>
+    <button class="btn mobile-only sheet-rail" id="openRail" type="button"><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg>Contact sheet</button>
+    <button class="btn mobile-only" id="openDos" type="button"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg>Dossier</button>
+    <span class="lbl a" style="margin-left:auto"><svg class="ic" aria-hidden="true"><use href="#i-monitor"/></svg> Desk 01</span>
+  </header>
+
+  <aside id="rail" aria-label="Evidence rail">
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg>Collection index</h2>
+    <div>
+      <div class="lbl" id="obsNo">Observation 0001</div>
+      <div class="obs-title" id="obsTitle">National Advisory Committee for Aeronautics transfer</div>
+    </div>
+    <div class="obs-tabs" id="obsTabs" role="group" aria-label="Choose observation"></div>
+    <div id="slots" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="exhibit">
+      <h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-lens"/></svg>Material exhibit</h2>
+      <button class="row" id="exhibitBtn" type="button" aria-label="Open material exhibit P-001">
+        <canvas id="pellet" width="72" height="72"></canvas>
+        <span style="display:flex;flex-direction:column;gap:2px"><span class="big mono">P-001</span><span class="lbl">5× crop</span><span class="lbl">RGB · 1:1 source</span></span>
+      </button>
+      <div class="lbl">Object class</div><div class="big">One pellet</div>
+      <div class="lbl">Historical effect</div><div style="color:var(--amber);font:400 12.5px var(--f-mono)">None recorded</div>
+    </div>
+  </aside>
+
+  <main id="center">
+    <div class="tabs"><div class="seg" role="tablist" aria-label="Workspaces">
+      <button role="tab" aria-selected="true" data-tab="arena" id="tab-arena"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg>Arena</button>
+      <button role="tab" aria-selected="false" data-tab="entities" id="tab-entities"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>Entities</button>
+      <button role="tab" aria-selected="false" data-tab="lineage" id="tab-lineage"><svg class="ic" aria-hidden="true"><use href="#i-branch"/></svg>Lineage</button>
+      <button role="tab" aria-selected="false" data-tab="records" id="tab-records"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Records</button></div>
+      <span class="sp"></span><div class="seg" id="tour" role="group" aria-label="Choose tour"><button type="button" data-tour="full" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-history"/></svg>Full history<span class="yrs">&nbsp;1775–2026</span></button><button type="button" data-tour="slice" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Reviewed slice<span class="yrs">&nbsp;1958–1977</span></button></div>
+    </div>
+    <div id="stage">
+      <canvas id="arena" tabindex="0" aria-label="Arena feed. Space plays or pauses, arrow keys step events."></canvas>
+      <div class="chip"><svg class="ic" aria-hidden="true"><use href="#i-aperture"/></svg>IMAGERY &nbsp;/&nbsp; CELLULAR</div>
+      <div class="datestamp"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="stamp"></span></div>
+      <div class="notice" id="notice" hidden>
+        <div class="top"><span class="lbl" style="display:inline-flex;gap:6px;align-items:center"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg><span id="noticeWhen">Elsewhere</span></span><button class="x" id="noticeStay" type="button"><svg class="ic sm" aria-hidden="true"><use href="#i-close"/></svg><span id="noticeStayT">Stay</span></button></div>
+        <button class="watch" id="noticeWatch" type="button"><svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg><span id="noticeText">Watch the Atomic Energy Commission split</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <div class="more" id="noticeMore" hidden></div>
+      </div>
+      <div class="card" id="pinEnd" hidden></div>
+      <div id="start"><button type="button" id="startBtn"><span class="tri"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>Play history</button></div>
+      <section class="ws" id="ws-entities" hidden></section>
+      <section class="ws" id="ws-lineage" hidden></section>
+      <section class="ws" id="ws-records" hidden></section>
+    </div>
+    <div id="transport">
+      <div id="owner"></div>
+      <span class="vsep"></span>
+      <div class="playhead"><span class="lbl">Archive playhead</span><span class="yr" id="yr">1958</span><span class="full" id="fulldate"></span></div>
+      <span class="vsep"></span>
+      <div class="tp">
+        <button type="button" id="prev" aria-label="Previous event"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button type="button" id="play" class="play" aria-label="Play history"><svg class="ic" aria-hidden="true"><use id="playUse" href="#i-play"/></svg><span id="playLbl">Play history</span></button>
+        <button type="button" id="next" aria-label="Next event"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+      </div>
+      <div id="speed"><button type="button" id="speedBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="speedMenu" aria-label="Playback speed"><svg class="ic" aria-hidden="true"><use href="#i-gauge"/></svg><span class="seg-l">SPEED</span><b id="speedVal">1×</b><svg class="ic sm" aria-hidden="true"><use href="#i-caret"/></svg></button>
+        <div id="speedMenu" role="menu" aria-label="Playback speed" hidden><div class="hd">PLAYBACK SPEED</div>
+          <button type="button" role="menuitemradio" data-speed="-1" aria-checked="false"><span>−1×</span><span class="d">Reverse, back toward 1775</span></button>
+          <button type="button" role="menuitemradio" data-speed="0.1" aria-checked="false"><span>0.1×</span><span class="d">Comically slow</span></button>
+          <button type="button" role="menuitemradio" data-speed="0.5" aria-checked="false"><span>0.5×</span><span class="d">Half speed</span></button>
+          <button type="button" role="menuitemradio" data-speed="1" aria-checked="true"><span>1×</span><span class="d" id="speedNorm">Normal</span></button>
+          <button type="button" role="menuitemradio" data-speed="1.5" aria-checked="false"><span>1.5×</span><span class="d"></span></button>
+          <button type="button" role="menuitemradio" data-speed="2" aria-checked="false"><span>2×</span><span class="d"></span></button>
+          <button type="button" role="menuitemradio" data-speed="25" aria-checked="false"><span>25×</span><span class="d">Fast-forward, wide view</span></button>
+        </div></div>
+      <button type="button" id="replay"><svg class="ic" aria-hidden="true"><use href="#i-replay"/></svg>REPLAY</button>
+    </div>
+    <div id="timeline">
+      <div class="tl-head"><h3>Event timeline</h3><span class="lbl" id="tlNote">3 reviewed records · dates linear</span></div>
+      <div id="tl" role="slider" tabindex="0" aria-label="Historical date" aria-valuemin="1958" aria-valuemax="1978"></div>
+      <div class="onrec"><span class="lbl a" style="display:inline-flex;gap:6px;align-items:center"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>On record</span><span class="t" id="onrec" aria-live="polite"></span><span class="ph-tag" id="phaseTag"></span></div>
+    </div>
+  </main>
+
+  <aside id="dossier" aria-label="Entity dossier">
+    <div class="dsec">
+      <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg>Entity dossier</h2><span class="lbl" id="selMode">Auto select</span></div>
+      <div class="ent"><canvas id="emb" width="112" height="112"></canvas><div><div class="lbl">Selected institution</div><div class="short" id="dShort">National Aeronautics and Space Administration</div></div></div>
+      <div class="long" id="dLong"></div>
+      <dl class="kv" id="dKv"></dl>
+      <p class="expl" id="dExpl"></p>
+      <div class="btnrow" id="dBtns"></div>
+    </div>
+    <div class="dsec" id="lineage">
+      <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-branch"/></svg>Lineage trace</h2><span class="lbl" id="linNote"></span></div>
+      <svg id="linSvg" viewBox="0 0 320 96" role="group" aria-label="Lineage trace"></svg>
+      <div class="expl" id="linText"></div>
+    </div>
+    <div class="dsec">
+      <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg>Arena overview</h2><span class="lbl">Camera footprint</span></div>
+      <canvas id="mini" width="640" height="240" aria-label="Minimap. Click to look at a location."></canvas>
+    </div>
+    <div class="dsec" style="border-bottom:0">
+      <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Session log</h2><span class="lbl">Viewing time</span></div>
+      <ul id="log"></ul>
+    </div>
+  </aside>
+
+  <footer><span>Workspace / Federal</span><span>Statecraft / Historical entity observation</span><span id="ftds"></span><span class="r">Sensor return / Cellular imagery</span></footer>
+  <div id="drawer" hidden role="dialog" aria-modal="false" aria-labelledby="drawerTitle"></div>
+</div>
+
+<script>
+"use strict";
+/* ================= DATA (fixture pinned to census v0.2) ================= */
+const DATASET = "census-v0.2-draft/slice-1";
+const DATASET_PIN = "graph.json sha256 c44c1d1eeda02845 · 8,447 units · 739 edges";
+/* Units with a law/stated/history start, live in each year (computed from core/graph.json; unverified draft) */
+const DATED_LIVE = {1958:898,1959:902,1960:908,1961:916,1962:914,1963:917,1964:935,1965:933,1966:943,1967:941,1968:946,1969:961,1970:968,1971:978,1972:982,1973:966,1974:966,1975:967,1976:973,1977:953};
+const RENDER_V = 3;
+const DAY = 864e5;
+const D = s => Date.parse(s + "T00:00:00Z");
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmt = ms => { const d = new Date(ms); return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear(); };
+const fmtShort = ms => { const d = new Date(ms); return MONTHS[d.getUTCMonth()].toUpperCase() + " " + d.getUTCFullYear(); };
+
+const SRC = {
+  nasa65: { title: "65 Years Ago: NASA Begins Operations", publisher: "National Aeronautics and Space Administration history office, published 2 Oct 2023", url: "https://www.nasa.gov/history/65-years-ago-nasa-begins-operations/", locator: "Article body", status: "Checked 19 Nov 2026" },
+  nrc533: { title: "Atomic Fission: The Breakup of the Atomic Energy Commission and the Energy Reorganization Act of 1974 (NUREG/BR-0533)", publisher: "U.S. Nuclear Regulatory Commission, Feb 2025 (T. Wellock, E. Boyle)", url: "https://www.nrc.gov/regulations-legislation/nureg-series-publications/brochures-prepared-by-nrc-staff/br0533", locator: "Abstract, landing page (PDF not read)", status: "Checked 19 Nov 2026" },
+  govman: { title: "History of Agency Organizational Changes", publisher: "U.S. Government Manual, 2020 edition (GovInfo)", url: "https://www.govinfo.gov/content/pkg/GOVMAN-2020-11-10/pdf/GOVMAN-2020-11-10-History-of-Agency-Organizational-Changes-104.pdf", status: "Census v0.2 extraction" }
+};
+
+/* Slice entities: IDs, dates and primary citations come from out/census_v0.2_canonical.csv */
+const ENT = {
+  NACA: { id: "u-gm-7404", short: "National Advisory Committee for Aeronautics", abbr: "NACA", name: "National Advisory Committee for Aeronautics", color: "#ff8e4d", glyph: "wing", home: [1390, 820], seed: 1.3, slice: true,
+    from: D("1915-03-03"), until: "ev-slice-001", parent: "None (independent committee)",
+    dates: "Established 3 Mar 1915 (38 Stat. 930). Ended 1 Oct 1958.",
+    expl: "The federal aeronautics research committee founded in 1915. Its laboratories and staff were incorporated into the National Aeronautics and Space Administration when it began operations on 1 Oct 1958.",
+    cite: { url: "https://www.govinfo.gov/content/pkg/GOVMAN-2020-11-10/pdf/GOVMAN-2020-11-10-History-of-Agency-Organizational-Changes-104.pdf", loc: "History of Agency Organizational Changes: \"Aeronautics, National Advisory Committee for\"" } },
+  NASA: { id: "u-rg255", short: "National Aeronautics and Space Administration", abbr: "NASA", name: "National Aeronautics and Space Administration", color: "#4a7ff0", glyph: "planet", home: [900, 980], seed: 2.1, slice: true,
+    from: D("1958-07-29"), ops: "ev-slice-001", parent: "None (independent establishment)",
+    dates: "Act signed 29 Jul 1958 (72 Stat. 426). Operations from 1 Oct 1958.",
+    expl: "The civilian space and aeronautics agency created by the National Aeronautics and Space Act of 1958. It began operations on 1 Oct 1958 with the National Advisory Committee for Aeronautics as its core.",
+    cite: { url: "https://www.archives.gov/research/guide-fed-records/groups/255.html", loc: "Guide to Federal Records, sec. 255.1" } },
+  AEC: { id: "u-rg326", short: "Atomic Energy Commission", abbr: "AEC", name: "Atomic Energy Commission", color: "#8e78cf", glyph: "atom", home: [2240, 640], seed: 3.7, slice: true,
+    from: D("1946-08-01"), until: "ev-slice-002", parent: "None (independent commission)",
+    dates: "Established 1 Aug 1946 (60 Stat. 755). Abolished by act of 11 Oct 1974; divided 19 Jan 1975.",
+    expl: "The civilian atomic energy commission created in 1946. The Energy Reorganization Act of 1974 divided it; the Energy Research and Development Administration and the Nuclear Regulatory Commission took over on 19 Jan 1975.",
+    cite: { url: "https://www.archives.gov/research/guide-fed-records/groups/326.html", loc: "Guide to Federal Records, sec. 326.1" } },
+  ERDA: { id: "u-rg430", short: "Energy Research and Development Administration", abbr: "ERDA", name: "Energy Research and Development Administration", color: "#f0a957", glyph: "bolt", home: [2400, 735], seed: 4.4, slice: true,
+    from: "ev-slice-002", until: "ev-slice-003", parent: "None (independent agency)",
+    dates: "Act of 11 Oct 1974 (88 Stat. 1234). Operations 19 Jan 1975 to 1 Oct 1977.",
+    expl: "Took over the Atomic Energy Commission's research, development and weapons work on 19 Jan 1975. It was one of three agencies merged into the Department of Energy on 1 Oct 1977.",
+    cite: { url: "https://www.archives.gov/research/guide-fed-records/groups/430.html", loc: "Guide to Federal Records, sec. 430.1" } },
+  NRC: { id: "u-rg431", short: "Nuclear Regulatory Commission", abbr: "NRC", name: "Nuclear Regulatory Commission", color: "#c98ad6", glyph: "shield", home: [2085, 560], seed: 5.9, slice: true,
+    from: "ev-slice-002", parent: "None (independent commission)",
+    dates: "Act of 11 Oct 1974. Operations from 19 Jan 1975.",
+    expl: "Took over the Atomic Energy Commission's licensing and regulatory work on 19 Jan 1975.",
+    cite: { url: "https://www.archives.gov/research/guide-fed-records/groups/431.html", loc: "Guide to Federal Records, sec. 431.1" } },
+  DOE: { id: "u-fr-136", short: "Department of Energy", abbr: "DOE", name: "Department of Energy", color: "#3f9e93", glyph: "pylon", home: [2620, 1210], seed: 6.2, slice: true,
+    from: D("1977-08-04"), ops: "ev-slice-003", parent: "None (executive department)",
+    dates: "Act signed 4 Aug 1977 (91 Stat. 565). Operations from 1 Oct 1977.",
+    expl: "The executive department created by the Department of Energy Organization Act of 1977. It began operations on 1 Oct 1977; this slice follows the Energy Research and Development Administration lineage into it.",
+    cite: { url: "https://www.federalregister.gov/agencies/energy-department", loc: "Federal Register agency list, id 136" } }
+};
+/* Context cells: real census units that exist for the whole slice. No events, excluded from rankings. */
+const CTX = {
+  TREAS: { id: "u-fr-497", short: "Department of the Treasury", abbr: "Treasury", name: "Department of the Treasury", color: "#3f8c83", glyph: "portico", home: [470, 1250], r: 104, seed: 7.1 },
+  COMM:  { id: "u-fr-54", short: "Department of Commerce", abbr: "Commerce", name: "Department of Commerce", color: "#4f9b9b", glyph: "anchor", home: [1300, 380], r: 112, seed: 8.3 },
+  FCC:   { id: "u-rg173", short: "Federal Communications Commission", abbr: "FCC", name: "Federal Communications Commission", color: "#b468d6", glyph: "mast", home: [930, 520], r: 60, seed: 9.2 },
+  CENSUS:{ id: "u-rg029", short: "Bureau of the Census", abbr: "Census", name: "Bureau of the Census", color: "#a98c4c", glyph: "tally", home: [1080, 1440], r: 66, seed: 10.4 },
+  DEF:   { id: "u-fr-103", short: "Department of Defense", abbr: "Defense", name: "Department of Defense", color: "#86709f", glyph: "star", home: [1720, 1320], r: 112, seed: 11.6 },
+  USGS:  { id: "u-rg057", short: "U.S. Geological Survey", abbr: "USGS", name: "U.S. Geological Survey", color: "#6e9a5e", glyph: "mountain", home: [1900, 180], r: 78, seed: 12.8 },
+  AGRI:  { id: "u-fr-12", short: "Department of Agriculture", abbr: "Agriculture", name: "Department of Agriculture", color: "#8f9a4e", glyph: "wheat", home: [2280, 1690], r: 92, seed: 13.3 },
+  LABOR: { id: "u-fr-271", short: "Department of Labor", abbr: "Labor", name: "Department of Labor", color: "#8b5c70", glyph: "hardhat", home: [3010, 960], r: 76, seed: 14.9 }
+};
+for (const k in ENT) ENT[k].key = k;
+for (const k in CTX) { CTX[k].key = k; CTX[k].ctx = true; }
+
+/* Three reviewed events. A = approach start, C = contact (effective instant), CE = end of contact, S = settled (tour seconds). */
+const EVENTS = [
+  { id: "ev-slice-001", kind: "absorb", lane: "inc", short: "National Advisory Committee for Aeronautics transfer", title: "National Advisory Committee for Aeronautics incorporated into the National Aeronautics and Space Administration", approach: "National Advisory Committee for Aeronautics on approach", noticeText: "Watch the National Advisory Committee for Aeronautics join the National Aeronautics and Space Administration",
+    donor: "NACA", recipient: "NASA", eff: D("1958-10-01"), enacted: D("1958-07-29"), A: 0.6, C: 2.6, CE: 3.2, S: 4.6,
+    authority: "National Aeronautics and Space Act of 1958, Pub. L. 85-568, approved 29 Jul 1958 (72 Stat. 426); National Advisory Committee for Aeronautics termination at 72 Stat. 432",
+    census: "edge ev-00030 (absorbed, dated 1958-07-29 by statute)",
+    claims: [
+      { src: "nasa65", q: "On Oct. 1, 1958, the National Aeronautics and Space Administration (NASA) officially began operations." },
+      { src: "nasa65", q: "As its core, the new agency incorporated the National Advisory Committee for Aeronautics (NACA), founded in 1915 to advance aeronautics research in the United States." },
+      { src: "govman", loc: "Entry \"Aeronautics, National Advisory Committee for\"", q: "Terminated by act of July 29, 1958 (72 Stat. 432), and functions transferred to National Aeronautics and Space Administration, established by same act." }
+    ] },
+  { id: "ev-slice-002", kind: "split", lane: "spl", short: "Atomic Energy Commission division", title: "Atomic Energy Commission divides into the Nuclear Regulatory Commission and the Energy Research and Development Administration", approach: "Atomic Energy Commission before division", noticeText: "Watch the Atomic Energy Commission split",
+    parent: "AEC", successors: ["ERDA", "NRC"], eff: D("1975-01-19"), enacted: D("1974-10-11"), A: 10.0, C: 11.8, CE: 12.4, S: 13.8,
+    authority: "Energy Reorganization Act of 1974, Pub. L. 93-438, signed 11 Oct 1974 (88 Stat. 1233); Atomic Energy Commission abolition at 88 Stat. 1237",
+    census: "edges ev-04204, ev-04205 (absorbed, dated 1974-10-11 by statute)",
+    note: "Allocation between successors is not recorded. Each successor starts with its own unit of mass; nothing is inferred from area.",
+    claims: [
+      { src: "nrc533", q: "On October 11, 1974, President Gerald Ford signed the Energy Reorganization Act of 1974 (ERA), which separated the U.S. Atomic Energy Commission (AEC) into two new agencies, the U.S. Nuclear Regulatory Commission (NRC) and the U.S. Energy Research and Development Administration (ERDA)." },
+      { src: "nrc533", q: "ERDA and the NRC began operations on January 19, 1975." },
+      { src: "govman", loc: "Entry \"Atomic Energy Commission\"", q: "Abolished by act of Oct. 11, 1974 (88 Stat. 1237) and functions transferred to Energy Research and Development Administration and Nuclear Regulatory Commission." }
+    ] },
+  { id: "ev-slice-003", kind: "absorb", lane: "inc", short: "Energy Research and Development Administration transfer", title: "Energy Research and Development Administration joins the Department of Energy", approach: "Energy Research and Development Administration on approach to the Department of Energy", noticeText: "Watch the Energy Research and Development Administration join the Department of Energy",
+    donor: "ERDA", recipient: "DOE", eff: D("1977-10-01"), enacted: D("1977-08-04"), A: 16.6, C: 18.4, CE: 19.0, S: 20.4,
+    authority: "Department of Energy Organization Act, Pub. L. 95-91, signed 4 Aug 1977 (91 Stat. 565); Energy Research and Development Administration termination at 91 Stat. 577",
+    census: "edge ev-04501 (absorbed, dated 1977-08-04 by statute)",
+    note: "This beat follows the Energy Research and Development Administration lineage. It was one of three agencies merged into the Department of Energy on this date. The dataset also records Federal Energy Administration (edge ev-00683) and Federal Power Commission (edge ev-04832) absorptions into the Department of Energy; they need their own reviewed roles before they join the tour.",
+    claims: [
+      { src: "nrc533", q: "On October 1, 1977, ERDA was one of three agencies merged into the new U.S. Department of Energy (DOE)." },
+      { src: "govman", loc: "Entry \"Energy Research and Development Administration\"", q: "Terminated by act of Aug. 4, 1977 (91 Stat. 577), and functions transferred to the Department of Energy." }
+    ] }
+];
+const EVI = Object.fromEntries(EVENTS.map(e => [e.id, e]));
+const resolveDate = v => typeof v === "string" ? EVI[v].eff : v;
+for (const k in ENT) { const e = ENT[k]; e.fromMs = resolveDate(e.from); e.untilMs = e.until ? resolveDate(e.until) : Infinity; e.opsMs = e.ops ? resolveDate(e.ops) : e.fromMs; }
+
+/* Tour clock: tour seconds <-> historical date, strictly increasing piecewise-linear map */
+const half = DAY / 2;
+const KF = [
+  [0, D("1958-09-14")], [0.6, D("1958-09-20")], [2.6, EVENTS[0].eff], [3.2, EVENTS[0].eff + half], [4.6, D("1958-10-08")],
+  [10.0, D("1975-01-08")], [11.8, EVENTS[1].eff], [12.4, EVENTS[1].eff + half], [13.8, D("1975-01-26")],
+  [15.4, D("1977-07-20")], [16.6, D("1977-09-20")], [18.4, EVENTS[2].eff], [19.0, EVENTS[2].eff + half], [20.4, D("1977-10-08")], [21.2, D("1977-10-12")]
+];
+const TEND = KF[KF.length - 1][0];
+function dateAt(T) {
+  T = Math.max(0, Math.min(TEND, T));
+  for (let i = 1; i < KF.length; i++) if (T <= KF[i][0]) { const [t0, d0] = KF[i - 1], [t1, d1] = KF[i]; return d0 + (d1 - d0) * (T - t0) / (t1 - t0); }
+  return KF[KF.length - 1][1];
+}
+function TAt(ms) {
+  if (ms <= KF[0][1]) return 0;
+  for (let i = 1; i < KF.length; i++) if (ms <= KF[i][1]) { const [t0, d0] = KF[i - 1], [t1, d1] = KF[i]; return t0 + (t1 - t0) * (ms - d0) / (d1 - d0); }
+  return TEND;
+}
+
+/* ================= HISTORICAL STATE (reversible, derived only from date) ================= */
+const isAlive = (k, ms) => { const e = ENT[k]; return ms >= e.fromMs && ms < e.untilMs; };
+function massAt(k, ms) {
+  if (!isAlive(k, ms)) return 0;
+  let m = 1;
+  for (const ev of EVENTS) if (ev.kind === "absorb" && ev.recipient === k && ms >= ev.eff) m += 1; /* donor's recorded unit, transferred once */
+  return m;
+}
+function statusAt(k, ms) {
+  const e = ENT[k];
+  if (ms < e.fromMs) return { s: "Not yet established", tag: "off" };
+  if (ms >= e.untilMs) { const ev = EVI[e.until]; return { s: ev.kind === "split" ? "Ended " + fmt(ev.eff) + " · divided into the Energy Research and Development Administration and the Nuclear Regulatory Commission" : "Ended " + fmt(ev.eff) + " · incorporated into the " + ENT[ev.recipient].name, tag: "off" }; }
+  if (ms < e.opsMs) return { s: "Established by statute · operations begin " + fmt(e.opsMs), tag: "amb" };
+  return { s: "Active", tag: "on" };
+}
+function edgesAt(ms) {
+  const out = [];
+  for (const ev of EVENTS) {
+    const active = ms >= ev.eff;
+    if (ev.kind === "absorb") out.push({ from: ev.donor, to: ev.recipient, ev, active, label: "incorporated" });
+    else for (const s of ev.successors) out.push({ from: ev.parent, to: s, ev, active, label: "divided" });
+  }
+  return out;
+}
+function activeSliceAt(ms) { return Object.keys(ENT).filter(k => isAlive(k, ms) && ms >= ENT[k].opsMs); }
+
+/* ================= SIMULATION (pure function of tour time T) ================= */
+const WORLD = { w: 3200, h: 2000 };
+const R0 = 78;
+const ease = u => u < 0 ? 0 : u > 1 ? 1 : u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const clamp01 = u => u < 0 ? 0 : u > 1 ? 1 : u;
+const lerp = (a, b, u) => a + (b - a) * u;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function drift(e, T, home) {
+  const h = home || e.home, s = e.seed, A = reduced ? 0 : 1;
+  return [h[0] + A * (Math.sin(T * 0.41 + s) * 13 + Math.sin(T * 0.17 + s * 2.3) * 9), h[1] + A * (Math.cos(T * 0.36 + s * 1.7) * 13 + Math.cos(T * 0.11 + s) * 8)];
+}
+function mix(c1, c2, u) {
+  const p = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+  const a = p(c1), b = p(c2);
+  return "#" + a.map((v, i) => Math.round(lerp(v, b[i], u)).toString(16).padStart(2, "0")).join("");
+}
+function shade(c, f) { return f < 0 ? mix(c, "#000000", -f) : mix(c, "#ffffff", f); }
+
+/* base position of a slice entity outside of its own event choreography */
+function basePos(k, T) {
+  if (k === "ERDA" || k === "NRC") {
+    const ev = EVENTS[1];
+    if (T < ev.S) return splitChildPos(k, T);
+  }
+  return drift(ENT[k], T);
+}
+function splitGeom(T) {
+  const ev = EVENTS[1], P = drift(ENT.AEC, Math.min(T, ev.CE));
+  const dE = ENT.ERDA.home, dN = ENT.NRC.home;
+  let ax = dE[0] - dN[0], ay = dE[1] - dN[1]; const L = Math.hypot(ax, ay); ax /= L; ay /= L;
+  return { P, ax, ay };
+}
+function splitChildPos(k, T) {
+  const ev = EVENTS[1], g = splitGeom(T), sign = k === "ERDA" ? 1 : -1;
+  const v = clamp01((T - ev.C) / (ev.CE - ev.C)), sep = R0 * 1.12 * ease(v);
+  const p = [g.P[0] + g.ax * sep * sign, g.P[1] + g.ay * sep * sign];
+  if (T <= ev.CE) return p;
+  const gE = splitGeom(ev.CE), pE = [gE.P[0] + gE.ax * R0 * 1.12 * sign, gE.P[1] + gE.ay * R0 * 1.12 * sign];
+  const u = ease((T - ev.CE) / (ev.S - ev.CE)), d = drift(ENT[k], T);
+  return [lerp(pE[0], d[0], u), lerp(pE[1], d[1], u)];
+}
+function radiusVis(k, T) {
+  let m = 1;
+  for (const ev of EVENTS) if (ev.kind === "absorb" && ev.recipient === k) m += clamp01((T - ev.C) / (ev.CE - ev.C + 0.5));
+  return R0 * Math.sqrt(m);
+}
+function absorbDonor(ev, T) {
+  const rec = basePos(ev.recipient, T), rR = radiusVis(ev.recipient, T), rD = R0;
+  const p0 = basePos(ev.donor, ev.A), recA = basePos(ev.recipient, ev.A);
+  let dx = p0[0] - recA[0], dy = p0[1] - recA[1]; const L = Math.hypot(dx, dy); dx /= L; dy /= L;
+  const touch = rR + rD * 0.85;
+  const cpt = [rec[0] + dx * touch, rec[1] + dy * touch];
+  if (T < ev.A) return { p: basePos(ev.donor, T), r: rD, a: 1, dir: [dx, dy] };
+  if (T < ev.C) {
+    const u = ease((T - ev.A) / (ev.C - ev.A)), bend = Math.sin(Math.PI * u) * 38;
+    const start = basePos(ev.donor, ev.A);
+    return { p: [lerp(start[0], cpt[0], u) - dy * bend, lerp(start[1], cpt[1], u) + dx * bend], r: rD, a: 1, dir: [dx, dy] };
+  }
+  const v = clamp01((T - ev.C) / (ev.CE - ev.C)), w = v * v;
+  return { p: [lerp(cpt[0], rec[0], w), lerp(cpt[1], rec[1], w)], r: rD * (1 - 0.55 * v), a: 1 - v * v, dir: [dx, dy], behind: true };
+}
+/* All drawable cells at tour time T. Used by the live feed, captures, minimap and hit testing. */
+function cellsAt(T) {
+  const ms = dateAt(T), out = [];
+  for (const k in CTX) { const c = CTX[k], p = drift(c, T); out.push({ key: k, ent: c, x: p[0], y: p[1], r: c.r, color: c.color, label: c.short, glyph: c.glyph, a: 1, order: 0 }); }
+  for (const k in ENT) {
+    const e = ENT[k];
+    if (k === "ERDA" || k === "NRC") { if (T < EVENTS[1].C) continue; }
+    else if (ms < e.fromMs) continue;
+    let item = { key: k, ent: e, r: radiusVis(k, T), color: e.color, label: e.short, glyph: e.glyph, a: 1, order: 1, slice: true };
+    const absorbAsDonor = EVENTS.find(ev => ev.kind === "absorb" && ev.donor === k);
+    if (absorbAsDonor && T >= absorbAsDonor.A) {
+      if (T >= absorbAsDonor.CE) continue;
+      const d = absorbAsDonor.kind && absorbDonor(absorbAsDonor, T);
+      Object.assign(item, { x: d.p[0], y: d.p[1], r: d.r, a: d.a, order: 1, trail: T < absorbAsDonor.C ? absorbAsDonor : null });
+    } else if (k === "AEC") {
+      const ev = EVENTS[1];
+      if (T >= ev.CE) continue;
+      const p = drift(e, Math.min(T, ev.CE));
+      Object.assign(item, { x: p[0], y: p[1] });
+      if (T >= ev.C) { item.neck = true; }
+      else if (T > ev.C - 0.6) { const g = splitGeom(T); item.stretch = { u: ease((T - (ev.C - 0.6)) / 0.6) * 0.07, ax: g.ax, ay: g.ay }; }
+    } else {
+      const p = basePos(k, T); item.x = p[0]; item.y = p[1];
+    }
+    if (k === "ERDA" || k === "NRC") { const ev = EVENTS[1]; if (T < ev.CE) item.childOfNeck = true; }
+    for (const ev of EVENTS) {
+      if (ev.kind === "absorb" && ev.recipient === k) {
+        if (T >= ev.C && T < ev.CE + 0.4) { const v = clamp01((T - ev.C) / (ev.CE + 0.4 - ev.C)); item.squash = { u: Math.sin(Math.PI * v) * 0.08, dir: absorbDonor(ev, ev.C).dir }; }
+        if (T >= ev.C) item.trace = mix(ENT[ev.donor].color, "#ffffff", 0.05), item.traceA = clamp01((T - ev.C) / 0.8);
+        item.order = 2;
+      }
+    }
+    if (ms < e.opsMs) item.preop = true;
+    if (k === "DOE") { const t0 = TAt(e.fromMs); item.pop = clamp01((T - t0) / 0.35); }
+    out.push(item);
+  }
+  out.sort((a, b) => a.order - b.order || a.r - b.r);
+  return out;
+}
+
+/* ================= PELLETS (decoration only) ================= */
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const PEL_COLORS = ["#f0675d", "#f5a742", "#f2cf45", "#6cc36b", "#46b7c6", "#5b8def", "#a874e0", "#ec6fb0"];
+const PELLETS = (() => { const rnd = mulberry(1958), arr = []; for (let i = 0; i < 1400; i++) arr.push({ x: rnd() * WORLD.w, y: rnd() * WORLD.h, r: 4 + rnd() * 2.6, c: PEL_COLORS[(rnd() * PEL_COLORS.length) | 0] }); return arr; })();
+/* P-001: seeded choice of an unobstructed pellet, checked against every cell at every sampled tour time */
+const P001 = (() => {
+  const samples = []; for (let T = 0; T <= TEND; T += 0.2) samples.push(cellsAt(T));
+  let best = null, bestD = Infinity; const target = ENT.NASA.home;
+  for (const p of PELLETS) {
+    const ok = samples.every(cs => cs.every(c => Math.hypot(c.x - p.x, c.y - p.y) > c.r * 1.12 + 60)) && PELLETS.every(q => q === p || Math.hypot(q.x - p.x, q.y - p.y) > 22);
+    if (!ok) continue;
+    const d = Math.hypot(p.x - target[0], p.y - target[1]); if (d < bestD) { bestD = d; best = p; }
+  }
+  return best;
+})();
+
+/* ================= GLYPHS (24-unit masters; repository has no emblem set) ================= */
+function glyph(ctx, name, s, col) {
+  ctx.save(); ctx.scale(s / 24, s / 24); ctx.translate(-12, -12);
+  ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  const P = new Path2D();
+  switch (name) {
+    case "planet": ctx.beginPath(); ctx.arc(12, 12, 5.2, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(12, 12, 10.5, 3.6, -0.42, 0, 7); ctx.lineWidth = 1.8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(20.6, 6.2, 1.6, 0, 7); ctx.fill(); break;
+    case "wing": ctx.beginPath(); ctx.moveTo(2, 13); ctx.lineTo(22, 10.4); ctx.lineTo(22.5, 12.4); ctx.lineTo(14.5, 13.2); ctx.lineTo(9.5, 20.5); ctx.lineTo(7.4, 20.5); ctx.lineTo(10.2, 13.6); ctx.lineTo(5.2, 14); ctx.lineTo(3.4, 16.2); ctx.lineTo(2, 16.2); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(10.2, 11.6); ctx.lineTo(8, 4); ctx.lineTo(10, 4); ctx.lineTo(14.2, 11); ctx.closePath(); ctx.fill(); break;
+    case "atom": ctx.lineWidth = 1.5; for (const a of [0, 1.05, -1.05]) { ctx.beginPath(); ctx.ellipse(12, 12, 10, 3.8, a, 0, 7); ctx.stroke(); } ctx.beginPath(); ctx.arc(12, 12, 2.3, 0, 7); ctx.fill(); break;
+    case "bolt": ctx.beginPath(); ctx.moveTo(14, 1.5); ctx.lineTo(4.5, 13.5); ctx.lineTo(11, 13.5); ctx.lineTo(9, 22.5); ctx.lineTo(19.5, 9.5); ctx.lineTo(13, 9.5); ctx.closePath(); ctx.fill(); break;
+    case "shield": ctx.beginPath(); ctx.moveTo(12, 2.5); ctx.lineTo(20.5, 5.5); ctx.lineTo(20, 12.5); ctx.quadraticCurveTo(19, 18.5, 12, 22); ctx.quadraticCurveTo(5, 18.5, 4, 12.5); ctx.lineTo(3.5, 5.5); ctx.closePath(); ctx.lineWidth = 2.2; ctx.stroke(); ctx.beginPath(); ctx.arc(12, 11.5, 2.4, 0, 7); ctx.fill(); break;
+    case "pylon": ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(7, 22); ctx.lineTo(11, 3); ctx.lineTo(13, 3); ctx.lineTo(17, 22); ctx.moveTo(4, 8); ctx.lineTo(20, 8); ctx.moveTo(5.5, 12.5); ctx.lineTo(18.5, 12.5); ctx.moveTo(9.2, 12.5); ctx.lineTo(15.6, 19); ctx.moveTo(14.8, 12.5); ctx.lineTo(8.4, 19); ctx.stroke(); break;
+    case "portico": ctx.beginPath(); ctx.moveTo(2, 8); ctx.lineTo(12, 2.5); ctx.lineTo(22, 8); ctx.closePath(); ctx.fill(); ctx.fillRect(2.5, 19.5, 19, 2.5);
+      for (const x of [4.5, 9, 13.5, 18]) ctx.fillRect(x, 10, 2, 8.5); break;
+    case "tally": ctx.lineWidth = 2; ctx.beginPath(); for (const x of [6, 9.5, 13, 16.5]) { ctx.moveTo(x, 4); ctx.lineTo(x, 20); } ctx.moveTo(3, 16); ctx.lineTo(20.5, 8); ctx.stroke(); break;
+    case "mast": ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(12, 6); ctx.lineTo(7, 22); ctx.moveTo(12, 6); ctx.lineTo(17, 22); ctx.moveTo(9, 15); ctx.lineTo(15, 15); ctx.stroke();
+      ctx.beginPath(); ctx.arc(12, 5, 1.8, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(12, 5, 5.5, -2.5, -0.64); ctx.stroke(); ctx.beginPath(); ctx.arc(12, 5, 9, -2.45, -0.7); ctx.stroke(); break;
+    case "star": ctx.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 4.2 : 10, a = -Math.PI / 2 + i * Math.PI / 5; ctx.lineTo(12 + Math.cos(a) * r, 12.5 + Math.sin(a) * r); } ctx.closePath(); ctx.lineWidth = 2; ctx.stroke(); break;
+    case "mountain": ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(2, 20); ctx.lineTo(9, 7); ctx.lineTo(13, 14); ctx.lineTo(16, 10); ctx.lineTo(22, 20); ctx.stroke(); break;
+    case "wheat": ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(12, 23); ctx.lineTo(12, 3); for (const y of [6, 10.5, 15]) { ctx.moveTo(12, y + 4); ctx.lineTo(6.5, y); ctx.moveTo(12, y + 4); ctx.lineTo(17.5, y); } ctx.stroke(); break;
+    case "anchor": ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(12, 4.5, 2, 0, 7); ctx.moveTo(12, 6.5); ctx.lineTo(12, 21); ctx.moveTo(7.5, 10); ctx.lineTo(16.5, 10); ctx.moveTo(4, 14); ctx.quadraticCurveTo(5, 21, 12, 21); ctx.quadraticCurveTo(19, 21, 20, 14); ctx.stroke(); break;
+    case "hardhat": ctx.beginPath(); ctx.moveTo(4, 16); ctx.quadraticCurveTo(4.5, 6, 12, 6); ctx.quadraticCurveTo(19.5, 6, 20, 16); ctx.closePath(); ctx.fill(); ctx.fillRect(2, 16, 20, 3); break;
+  }
+  ctx.restore();
+}
+
+/* ================= RENDERER (Canvas 2D; same function for feed and evidence) ================= */
+function drawCellBody(ctx, x, y, r, color, T, seed, opts) {
+  const n = 56, wob = reduced ? 0 : Math.min(2.2, r * 0.02);
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const th = i / n * Math.PI * 2;
+    let rr = r + wob * Math.sin(th * 5 + T * 2.3 + seed) + wob * 0.6 * Math.sin(th * 3 - T * 1.7 + seed * 2);
+    if (opts.squash) { const c = Math.cos(th - Math.atan2(opts.squash.dir[1], opts.squash.dir[0])); rr *= 1 - opts.squash.u * Math.max(0, c); }
+    let px = Math.cos(th) * rr, py = Math.sin(th) * rr;
+    if (opts.stretch) { const s = opts.stretch, d = px * s.ax + py * s.ay; px += s.ax * d * s.u; py += s.ay * d * s.u; const ppx = -s.ay, ppy = s.ax, q = px * ppx + py * ppy; px -= ppx * q * s.u * 0.5; py -= ppy * q * s.u * 0.5; }
+    i ? ctx.lineTo(x + px, y + py) : ctx.moveTo(x + px, y + py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = color; ctx.fill();
+  ctx.lineWidth = Math.max(2, r * 0.07); ctx.strokeStyle = shade(color, -0.16);
+  if (opts.preop) ctx.setLineDash([r * 0.12, r * 0.08]);
+  ctx.stroke(); ctx.setLineDash([]);
+}
+const WRAP = new Map();
+function wrapLabel(ctx, text, r, withGlyph) {
+  const key = text + "|" + Math.round(r) + "|" + (withGlyph ? 1 : 0);
+  if (WRAP.has(key)) return WRAP.get(key);
+  const words = text.split(" "), W = r * 1.62, H = r * (withGlyph ? 0.92 : 1.28);
+  let best = null;
+  for (let fs = r * 0.44; fs >= r * 0.08; fs *= 0.93) {
+    ctx.font = `700 ${fs}px ${CELL_FONT}`;
+    const lines = []; let cur = "";
+    for (const w of words) { const t = cur ? cur + " " + w : w; if (cur && ctx.measureText(t).width > W) { lines.push(cur); cur = w; } else cur = t; }
+    lines.push(cur);
+    const h = lines.length * fs * 1.06, wmax = Math.max(...lines.map(l => ctx.measureText(l).width));
+    /* lines further from the centre get less room inside the circle */
+    const fits = wmax <= W && h <= H && lines.every((l, i) => { const dy = Math.abs((i - (lines.length - 1) / 2) * fs * 1.06) + fs * 0.5; return ctx.measureText(l).width <= 2 * Math.sqrt(Math.max(0, (r * 0.94) ** 2 - dy * dy)); });
+    if (fits) { best = { fs, lines }; break; }
+  }
+  if (!best) best = { fs: r * 0.08, lines: [text] };
+  WRAP.set(key, best); return best;
+}
+function drawLabel(ctx, x, y, r, text, glyphName, color, alpha, zoom) {
+  const sr = r * zoom; if (sr < 9 || alpha <= 0.02) return;
+  ctx.save(); ctx.globalAlpha *= alpha;
+  const showGlyph = sr >= 30 && glyphName;
+  const { fs, lines } = wrapLabel(ctx, text, r, showGlyph);
+  if (showGlyph) { ctx.save(); ctx.translate(x, y - r * 0.5); glyph(ctx, glyphName, r * 0.36, shade(color, -0.52)); ctx.restore(); }
+  if (fs * zoom >= 3.2) {
+    ctx.font = `700 ${fs}px ${CELL_FONT}`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const cy = showGlyph ? y + r * 0.16 : y, lh = fs * 1.06;
+    ctx.lineJoin = "round"; ctx.lineWidth = fs * 0.16; ctx.strokeStyle = "#1d2321"; ctx.fillStyle = "#ffffff";
+    lines.forEach((l, i) => { const ly = cy + (i - (lines.length - 1) / 2) * lh; ctx.strokeText(l, x, ly); ctx.fillText(l, x, ly); });
+  }
+  ctx.restore();
+}
+const CELL_FONT = '"Ubuntu", "Trebuchet MS", Arial, sans-serif';
+function renderWorld(ctx, W, H, cam, T, opt = {}) {
+  ctx.save();
+  ctx.fillStyle = "#ece9df"; ctx.fillRect(0, 0, W, H);
+  ctx.translate(W / 2, H / 2); ctx.scale(cam.z, cam.z); ctx.translate(-cam.x, -cam.y);
+  const vx0 = cam.x - W / 2 / cam.z, vy0 = cam.y - H / 2 / cam.z, vx1 = cam.x + W / 2 / cam.z, vy1 = cam.y + H / 2 / cam.z;
+  ctx.fillStyle = "#f8f6ef"; ctx.fillRect(0, 0, WORLD.w, WORLD.h);
+  /* grid */
+  ctx.beginPath(); const g = 50;
+  for (let x = Math.max(0, Math.floor(vx0 / g) * g); x <= Math.min(WORLD.w, vx1); x += g) { ctx.moveTo(x, Math.max(0, vy0)); ctx.lineTo(x, Math.min(WORLD.h, vy1)); }
+  for (let y = Math.max(0, Math.floor(vy0 / g) * g); y <= Math.min(WORLD.h, vy1); y += g) { ctx.moveTo(Math.max(0, vx0), y); ctx.lineTo(Math.min(WORLD.w, vx1), y); }
+  ctx.strokeStyle = "#e2dfd6"; ctx.lineWidth = 1 / cam.z; ctx.stroke();
+  /* pellets */
+  for (const p of PELLETS) {
+    if (p.x < vx0 - 8 || p.x > vx1 + 8 || p.y < vy0 - 8 || p.y > vy1 + 8) continue;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fillStyle = p.c; ctx.fill();
+  }
+  /* cells */
+  const cells = opt.cells || cellsAt(T);
+  for (const c of cells) {
+    if (c.x + c.r < vx0 || c.x - c.r > vx1 || c.y + c.r < vy0 - c.r || c.y - c.r > vy1 + c.r) continue;
+    ctx.save(); ctx.globalAlpha = c.a;
+    let r = c.r; if (c.pop !== undefined) r *= 0.4 + 0.6 * c.pop;
+    if (c.trail && !reduced) {
+      for (let i = 4; i >= 1; i--) { const q = absorbDonor(c.trail, T - i * 0.07); ctx.globalAlpha = 0.09 * (5 - i) / 4 * 1.6; ctx.beginPath(); ctx.arc(q.p[0], q.p[1], r * (0.92 - i * 0.04), 0, 7); ctx.fillStyle = c.color; ctx.fill(); }
+      ctx.globalAlpha = c.a;
+    }
+    if (c.neck) drawNeck(ctx, T, cam);
+    else if (c.childOfNeck) { /* drawn by neck */ }
+    else {
+      drawCellBody(ctx, c.x, c.y, r, c.color, T, (c.ent.seed || 1) * 3, { squash: c.squash, stretch: c.stretch, preop: c.preop });
+      if (c.trace) { ctx.save(); ctx.globalAlpha = c.a * c.traceA; ctx.fillStyle = c.trace; const n = 22; for (let i = 0; i < n; i++) { const th = i / n * 6.283 + 0.2; ctx.beginPath(); ctx.arc(c.x + Math.cos(th) * r * 0.84, c.y + Math.sin(th) * r * 0.84, Math.max(2.2, r * 0.035), 0, 7); ctx.fill(); } ctx.restore(); }
+      drawLabel(ctx, c.x, c.y, r, c.label, c.glyph, c.color, 1, cam.z);
+    }
+    ctx.restore();
+  }
+  /* pin corner marks */
+  if (opt.pin) {
+    const c = cells.find(q => q.key === opt.pin && !q.childOfNeck);
+    if (c) { const s = c.r + 14 / cam.z, L = 16 / cam.z; ctx.strokeStyle = "#f2b45a"; ctx.lineWidth = 2.4 / cam.z; ctx.beginPath();
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { ctx.moveTo(c.x + sx * s, c.y + sy * (s - L)); ctx.lineTo(c.x + sx * s, c.y + sy * s); ctx.lineTo(c.x + sx * (s - L), c.y + sy * s); } ctx.stroke(); }
+  }
+  ctx.restore();
+}
+function drawNeck(ctx, T, cam) {
+  const ev = EVENTS[1], v = clamp01((T - ev.C) / (ev.CE - ev.C)), g = splitGeom(T);
+  const cE = splitChildPos("ERDA", T), cN = splitChildPos("NRC", T), r = R0;
+  const colE = mix(ENT.AEC.color, ENT.ERDA.color, ease(v)), colN = mix(ENT.AEC.color, ENT.NRC.color, ease(v));
+  drawCellBody(ctx, cN[0], cN[1], r, colN, T, 5, {});
+  drawCellBody(ctx, cE[0], cE[1], r, colE, T, 7, {});
+  const hw = r * (0.92 - 0.88 * v), px = -g.ay, py = g.ax;
+  if (hw > 1) {
+    ctx.beginPath();
+    ctx.moveTo(cN[0] + px * hw, cN[1] + py * hw); ctx.quadraticCurveTo(g.P[0] + px * hw * 0.55, g.P[1] + py * hw * 0.55, cE[0] + px * hw, cE[1] + py * hw);
+    ctx.lineTo(cE[0] - px * hw, cE[1] - py * hw); ctx.quadraticCurveTo(g.P[0] - px * hw * 0.55, g.P[1] - py * hw * 0.55, cN[0] - px * hw, cN[1] - py * hw); ctx.closePath();
+    const grd = ctx.createLinearGradient(cN[0], cN[1], cE[0], cE[1]); grd.addColorStop(0, colN); grd.addColorStop(1, colE); ctx.fillStyle = grd; ctx.fill();
+    ctx.lineWidth = Math.max(2, r * 0.07); ctx.strokeStyle = shade(ENT.AEC.color, -0.16);
+    ctx.beginPath(); ctx.moveTo(cN[0] + px * hw, cN[1] + py * hw); ctx.quadraticCurveTo(g.P[0] + px * hw * 0.55, g.P[1] + py * hw * 0.55, cE[0] + px * hw, cE[1] + py * hw);
+    ctx.moveTo(cE[0] - px * hw, cE[1] - py * hw); ctx.quadraticCurveTo(g.P[0] - px * hw * 0.55, g.P[1] - py * hw * 0.55, cN[0] - px * hw, cN[1] - py * hw); ctx.stroke();
+  }
+  drawLabel(ctx, g.P[0], g.P[1], r, ENT.AEC.name, null, ENT.AEC.color, 1 - clamp01(v / 0.3), cam.z);
+  const la = clamp01((v - 0.25) / 0.3);
+  drawLabel(ctx, cE[0], cE[1], r, ENT.ERDA.name, "bolt", colE, la, cam.z);
+  drawLabel(ctx, cN[0], cN[1], r, ENT.NRC.name, "shield", colN, la, cam.z);
+}
+
+/* ================= CAMERA DIRECTOR ================= */
+function boundsCam(items, pad, W, H) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [x, y, r] of items) { x0 = Math.min(x0, x - r); y0 = Math.min(y0, y - r); x1 = Math.max(x1, x + r); y1 = Math.max(y1, y + r); }
+  const bw = (x1 - x0) * (1 + 2 * pad), bh = (y1 - y0) * (1 + 2 * pad);
+  return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, z: Math.max(0.12, Math.min(2.2, W / bw, H / bh)) };
+}
+function mixCam(a, b, u) { return { x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u), z: Math.exp(lerp(Math.log(a.z), Math.log(b.z), u)) }; }
+function evFrame(ev, T, which, W, H) {
+  if (ev.kind === "absorb") {
+    const rec = basePos(ev.recipient, T), rR = radiusVis(ev.recipient, T), d = absorbDonor(ev, T), start = basePos(ev.donor, ev.A);
+    if (which === "wide") return boundsCam([[rec[0], rec[1], rR], [start[0], start[1], R0], [d.p[0], d.p[1], d.r]], 1.0, W, H);
+    if (which === "contact") return boundsCam([[rec[0], rec[1], rR], [d.p[0], d.p[1], d.r]], 0.75, W, H);
+    return boundsCam([[rec[0], rec[1], rR]], 1.9, W, H);
+  }
+  const a = drift(ENT.AEC, Math.min(T, ev.CE)), e = basePos("ERDA", Math.max(T, ev.C)), n = basePos("NRC", Math.max(T, ev.C));
+  const dE = drift(ENT.ERDA, T), dN = drift(ENT.NRC, T);
+  if (which === "wide") return boundsCam([[a[0], a[1], R0], [dE[0], dE[1], R0], [dN[0], dN[1], R0]], 0.75, W, H);
+  if (which === "contact") return boundsCam([[a[0], a[1], R0], [dE[0], dE[1], R0], [dN[0], dN[1], R0]], 0.5, W, H);
+  return boundsCam([[e[0], e[1], R0], [n[0], n[1], R0]], 0.6, W, H);
+}
+function autoTarget(T, W, H) {
+  const E = EVENTS;
+  if (T < E[0].A) return evFrame(E[0], T, "wide", W, H);
+  for (let i = 0; i < E.length; i++) {
+    const ev = E[i];
+    if (T >= ev.A && T <= ev.S) {
+      if (T < ev.C) { const u = clamp01(((T - ev.A) / (ev.C - ev.A) - 0.35) / 0.65); return mixCam(evFrame(ev, T, "wide", W, H), evFrame(ev, T, "contact", W, H), ease(u)); }
+      if (T < ev.CE) return evFrame(ev, T, "contact", W, H);
+      return mixCam(evFrame(ev, T, "contact", W, H), evFrame(ev, T, "settle", W, H), ease((T - ev.CE) / (ev.S - ev.CE)));
+    }
+    const nx = E[i + 1];
+    if (nx && T > ev.S && T < nx.A) {
+      const u = (T - ev.S) / (nx.A - ev.S), a = evFrame(ev, T, "settle", W, H), b = evFrame(nx, T, "wide", W, H);
+      const c = mixCam(a, b, ease(u)), dist = Math.hypot(a.x - b.x, a.y - b.y) * c.z / Math.max(W, H);
+      if (dist > 0.6) c.z /= 1 + Math.min(0.45, dist * 0.25) * Math.sin(Math.PI * ease(u));
+      return c;
+    }
+  }
+  return evFrame(E[E.length - 1], T, "settle", W, H);
+}
+function involves(ev, k) { return ev.kind === "absorb" ? (ev.donor === k || ev.recipient === k) : (ev.parent === k || ev.successors.includes(k)); }
+function followTarget(k, T, W, H) {
+  for (const ev of EVENTS) if (involves(ev, k) && T >= ev.A && T <= ev.S) return autoTarget(T, W, H);
+  const c = cellsAt(T).find(q => q.key === k && !q.childOfNeck);
+  if (!c) return null;
+  return { x: c.x, y: c.y, z: Math.max(0.25, Math.min(1.6, H * 0.15 / c.r)) };
+}
+
+/* ================= VIEWER STATE ================= */
+const S = { tour: "full", Y: 1774.5, pinSinceY: 1774.5, capturing: false, hcells: [], T: 0, playing: false, speed: 1, mode: "auto", pin: null, returnPin: null, inspect: null, tab: "arena", prevTab: "arena",
+  pinSinceT: 0, dismissed: new Set(), pinEnd: null, ended: false, scrubbing: false, railPick: null, started: false };
+const cam = { x: 900, y: 900, z: 0.6 }; let snapCam = true;
+const T0 = performance.now();
+const zMin = () => S.tour === "full" ? 0.02 : 0.12;
+const LOG = [];
+function log(text, sys) {
+  const s = Math.floor((performance.now() - T0) / 1000);
+  LOG.push({ ts: String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"), text, sys: !!sys });
+  if (LOG.length > 80) LOG.shift();
+  renderLog();
+}
+const $ = id => document.getElementById(id);
+const ic = (n, cls) => `<svg class="ic${cls ? " " + cls : ""}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const arena = $("arena"), actx = arena.getContext("2d");
+let AW = 800, AH = 450, DPR = 1;
+function resize() {
+  const r = $("stage").getBoundingClientRect(); DPR = Math.min(2, devicePixelRatio || 1);
+  AW = Math.max(10, r.width); AH = Math.max(10, r.height);
+  arena.width = Math.round(AW * DPR); arena.height = Math.round(AH * DPR);
+  snapCam = snapCam || S.mode !== "free";
+  renderTimeline();
+}
+new ResizeObserver(resize).observe($("stage"));
+new ResizeObserver(() => renderTimeline()).observe($("tl"));
+
+function currentEventIndex(T) { let idx = -1; EVENTS.forEach((ev, i) => { if (T >= ev.A - 0.4) idx = i; }); return idx; }
+function autoSubject(T) {
+  if (T < EVENTS[1].A - 0.4) return "NASA";
+  if (T < EVENTS[1].C) return "AEC";
+  if (T < EVENTS[2].C) return "ERDA";
+  return "DOE";
+}
+function entOf(k) { return ENT[k] || CTX[k] || hkey(k); }
+const nowMs = () => S.tour === "full" ? yToMs(S.Y) : dateAt(S.T);
+const keyAlive = k => S.tour === "full" ? (hkey(k) ? hAlive(hkey(k), S.Y) : false) : isAlive(k, dateAt(S.T));
+const NM = k => entOf(k).name;
+
+/* ================= ACTIONS ================= */
+function seek(T, opts = {}) {
+  S.T = Math.max(0, Math.min(TEND, T)); S.ended = S.T >= TEND;
+  if (S.pin && S.T < S.pinSinceT) S.pinSinceT = S.T;
+  if (!opts.keepCam) snapCam = true;
+  if (!S.started) { S.started = true; $("start").hidden = true; }
+  S.pinEnd = null; captureGen++;
+  lastT = S.T;
+}
+function setPlaying(p, why) {
+  if (S.tour === "full") {
+    if (p && S.speed > 0 && S.Y >= FY1) { hReplay(); return; }
+    if (p && S.speed < 0 && S.Y <= FY0) seekY(FY1);
+  } else {
+    if (p && S.speed > 0 && S.T >= TEND) { replay(); return; }
+    if (p && S.speed < 0 && S.T <= 0) seek(TEND);
+  }
+  S.playing = p; S.started = true; $("start").hidden = true;
+  if (why !== false) log(p ? (S.speed < 0 ? "Play backward" : "Play history") + (S.speed !== 1 ? " · " + S.speed + "×" : "") : "Paused at " + fmt(nowMs()));
+}
+function replay() {
+  if (S.tour === "full") return hReplay();
+  seek(0); S.playing = true; S.started = true; S.ended = false; $("start").hidden = true;
+  S.dismissed.clear(); S.pinSinceT = 0; S.railPick = null;
+  if (S.pin && !isAlive(S.pin, dateAt(0))) { S.pin = null; S.mode = "auto"; }
+  if (S.mode === "free") S.mode = S.pin ? "follow" : "auto";
+  log("Replay" + (S.pin ? " · still following " + NM(S.pin) : ""));
+}
+function follow(k, how) {
+  S.pin = k; S.mode = "follow"; S.inspect = null; S.returnPin = null; S.pinSinceT = S.T; S.pinSinceY = S.Y; S.dismissed.clear(); S.pinEnd = null;
+  log(NM(k) + " pinned by viewer" + (how ? " · " + how : ""));
+}
+function unpin(how) { const k = S.pin; S.pin = null; S.mode = "auto"; S.pinEnd = null; log((how || "Pin closed") + " · auto tour resumed at " + fmt(nowMs())); return k; }
+function resumeTour() { S.mode = "auto"; S.pin = null; S.returnPin = null; S.pinEnd = null; log("Resume tour"); }
+function watchEvent(ev) {
+  const k = S.pin; S.pin = null; S.returnPin = null; S.mode = "auto"; S.pinEnd = null;
+  seek(ev.A - 0.5, { keepCam: true }); S.playing = true;
+  log("Watch " + ev.short + " · pin on " + NM(k) + " released");
+}
+function stepEvent(dir) {
+  if (S.tour === "full") return hStep(dir);
+  let target = null;
+  if (dir > 0) target = EVENTS.find(ev => ev.A - 0.3 > S.T + 0.05);
+  else target = [...EVENTS].reverse().find(ev => ev.A - 0.3 < S.T - 0.3);
+  if (!target) { if (dir < 0) { seek(0); log("Previous · start of tour"); } return; }
+  seek(target.A - 0.3); log((dir > 0 ? "Next" : "Previous") + " · " + target.short);
+}
+
+/* ================= EVIDENCE CAPTURE ================= */
+const RAIL_PHASES = {
+  absorb: ev => [{ key: "approach", label: "Approach", t: ev.C - 0.35 }, { key: "contact", label: "Contact", t: ev.C + 0.18 }, { key: "post", label: "Post-contact", t: ev.S - 0.15 }],
+  split: ev => [{ key: "before", label: "Before", t: ev.C - 0.4 }, { key: "division", label: "Division", t: ev.C + 0.3 }, { key: "successors", label: "Successors", t: ev.S - 0.15 }]
+};
+const capCache = new Map(); const capPending = new Set(); let captureGen = 0;
+const capKey = (ev, ph) => `${DATASET}|${ev.id}|${ph.key}|r${RENDER_V}`;
+function requestCapture(ev, ph) {
+  const key = capKey(ev, ph); if (capCache.has(key) || capPending.has(key)) return;
+  capPending.add(key); const gen = captureGen;
+  setTimeout(() => {
+    capPending.delete(key);
+    try {
+      const W = 352, H = 198, c = document.createElement("canvas"); c.width = W; c.height = H;
+      const fr = autoTarget(ph.t, W, H); /* canonical framing, separate render target: the live camera is untouched */
+      renderWorld(c.getContext("2d"), W, H, fr, ph.t);
+      capCache.set(key, c.toDataURL("image/png"));
+    } catch (e) { console.warn("capture failed", key, e); }
+    if (gen === captureGen || capCache.has(key)) renderRail(true);
+  }, 0);
+}
+
+/* ================= DOM RENDERING ================= */
+let railSig = "";
+function railEventIdx() { if (S.railPick !== null) return S.railPick; const i = currentEventIndex(S.T); return i < 0 ? 0 : i; }
+function renderRail(force) {
+  if (S.tour === "full") return renderRailFull(force);
+  const idx = railEventIdx(), ev = EVENTS[idx], phases = RAIL_PHASES[ev.kind](ev);
+  const filed = phases.map(p => S.T >= p.t);
+  const sig = [idx, filed.join(), phases.map(p => capCache.has(capKey(ev, p))).join(), currentEventIndex(S.T)].join("|");
+  if (sig === railSig && !force) return; railSig = sig;
+  $("obsNo").textContent = "Observation 000" + (idx + 1); $("obsTitle").textContent = ev.short;
+  const reached = currentEventIndex(S.T);
+  $("obsTabs").innerHTML = EVENTS.map((e, i) => `<button type="button" data-obs="${i}" aria-pressed="${i === idx}" ${i > Math.max(reached, 0) ? "disabled" : ""} title="${e.short}">0${i + 1}</button>`).join("");
+  let curPhase = -1; phases.forEach((p, i) => { if (filed[i]) curPhase = i; });
+  $("slots").innerHTML = phases.map((p, i) => {
+    const key = capKey(ev, p), img = capCache.get(key);
+    if (filed[i] && !img) requestCapture(ev, p);
+    const frame = filed[i] && img
+      ? `<button type="button" class="frame" data-seek="${p.t}" data-ev="${ev.id}" data-ph="${p.key}" aria-label="Open ${p.label} frame of ${ev.short}"><img alt="${p.label}: ${ev.title}, rendered from the simulation" src="${img}"></button>`
+      : `<div class="frame"><span class="await">${filed[i] ? "FILING FRAME" : "AWAITING FRAME"}</span></div>`;
+    return `<div class="slot ${i === curPhase && idx === reached ? "current" : ""}" data-slot="${p.key}" data-filed="${filed[i] && !!img}">${frame}<div class="meta"><span>0${i + 1} ${p.label}</span><span class="st ${filed[i] ? "" : "pend"}">${filed[i] ? (img ? ic("check", "sm") + "FILED" : "…") : ic("pending", "sm") + "PENDING"}</span></div></div>`;
+  }).join("");
+}
+$("obsTabs").addEventListener("click", e => { const hb = e.target.closest("[data-hobs]"); if (hb) { const i = +hb.dataset.hobs; if (i < 0 || i >= HB.length) return; S.railPick = i === hRailCur(S.Y) ? null : i; renderRail(true); log("Observation " + (i + 1) + " opened in rail"); return; }
+  const b = e.target.closest("[data-obs]"); if (!b) return; const i = +b.dataset.obs; S.railPick = i === currentEventIndex(S.T) ? null : i; renderRail(true); log("Observation 000" + (i + 1) + " opened in rail"); });
+$("slots").addEventListener("click", e => {
+  const hb = e.target.closest("[data-hseek]");
+  if (hb) {
+    const b = HB[+hb.dataset.hb], ph = H_PHASES(b).find(p => p.key === hb.dataset.ph);
+    S.playing = false; S.started = true; $("start").hidden = true;
+    if (S.mode === "follow") S.returnPin = S.pin;
+    S.pin = null; S.mode = "auto"; seekY(ph.t); S.railPick = b.i === hRailCur(ph.t) ? null : b.i;
+    log("Evidence frame opened · " + b.title + " / " + ph.label + " · paused"); return;
+  }
+  const b = e.target.closest("[data-seek]"); if (!b) return;
+  const ev = EVI[b.dataset.ev], ph = RAIL_PHASES[ev.kind](ev).find(p => p.key === b.dataset.ph);
+  S.playing = false; S.started = true; $("start").hidden = true;
+  if (S.mode === "follow") S.returnPin = S.pin;
+  S.pin = null; S.mode = "auto"; seek(ph.t); S.railPick = EVENTS.indexOf(ev) === currentEventIndex(ph.t) ? null : EVENTS.indexOf(ev);
+  log("Evidence frame opened · " + ev.short + " / " + ph.label + " · paused");
+});
+
+function renderOwner() {
+  const o = $("owner"); let h = "";
+  if (S.mode === "auto") h = `<span class="btn amber" aria-live="polite">${ic("route")}Auto tour</span>`;
+  else if (S.mode === "follow") h = `<button type="button" class="btn amber" id="ownUnpin" aria-label="Stop following ${NM(S.pin)}" title="Following ${NM(S.pin)}">${ic("lock")}<span class="own-t">Following ${NM(S.pin)}</span>${ic("close", "sm")}</button>`;
+  else h = `<span class="btn" style="color:var(--ink-2)">${ic("move")}Free view</span><button type="button" class="btn cyan" id="ownResume">${ic("route")}Resume tour</button>`;
+  if (S.returnPin && S.mode !== "follow" && keyAlive(S.returnPin)) h += `<button type="button" class="btn" id="ownReturn">${ic("return")}<span class="own-t">Return to ${NM(S.returnPin)}</span></button>`;
+  if (o._h !== h) { o.innerHTML = h; o._h = h; }
+}
+$("owner").addEventListener("click", e => {
+  if (e.target.closest("#ownUnpin")) unpin("Pin closed by viewer");
+  else if (e.target.closest("#ownResume")) { S.returnPin = null; resumeTour(); }
+  else if (e.target.closest("#ownReturn")) { const k = S.returnPin; S.returnPin = null; follow(k, "returned to agency"); }
+});
+
+function noticeState() {
+  if (S.mode !== "follow" || !S.pin) return null;
+  const due = EVENTS.filter(ev => !involves(ev, S.pin) && S.T >= ev.A - 0.4 && ev.S >= S.pinSinceT - 0.01);
+  const live = due.filter(ev => S.T <= ev.S + 2.5 && !S.dismissed.has(ev.id));
+  if (!live.length) return null;
+  const ev = live[live.length - 1];
+  return { ev, more: due.length - 1 };
+}
+let noticeSig = "", lastNoticeId = null;
+function renderNotice() {
+  if (S.tour === "full") return renderNoticeFull();
+  const n = noticeState(), el = $("notice");
+  const sig = n ? n.ev.id + "|" + n.more + "|" + S.pin : "";
+  if (sig === noticeSig) return; noticeSig = sig;
+  el.hidden = !n; if (!n) return;
+  $("noticeWhen").textContent = "Elsewhere / " + fmtShort(n.ev.eff);
+  $("noticeText").textContent = n.ev.noticeText;
+  $("noticeStayT").textContent = "Stay with " + NM(S.pin);
+  $("noticeMore").hidden = n.more < 1; $("noticeMore").textContent = `+${n.more} more event${n.more > 1 ? "s" : ""} while pinned · see Records`;
+  if (lastNoticeId !== n.ev.id) { lastNoticeId = n.ev.id; log("Event detected elsewhere · " + n.ev.short, true); }
+}
+$("noticeWatch").addEventListener("click", () => {
+  if (S.tour === "full") { const n = hNoticeState(); if (!n) return; const k = S.pin; S.pin = null; S.returnPin = null; S.mode = "auto"; S.pinEnd = null; seekY(n.b.t - LEAD, { keepCam: true }); S.playing = true; log("Watch " + n.b.title + " · pin on " + NM(k) + " released"); return; }
+  const n = noticeState(); if (n) watchEvent(n.ev); });
+$("noticeStay").addEventListener("click", () => {
+  if (S.tour === "full") { const n = hNoticeState(); if (n) { S.dismissed.add("b" + n.b.i); log("Notice dismissed · stayed with " + NM(S.pin)); } return; }
+  const n = noticeState(); if (n) { S.dismissed.add(n.ev.id); log("Notice dismissed · stayed with " + NM(S.pin)); } });
+
+function renderPinEnd() {
+  if (S.tour === "full") return renderPinEndFull();
+  const el = $("pinEnd"), p = S.pinEnd;
+  if (!p) { el.hidden = true; el._k = null; return; }
+  if (el._k === p.key) return; el._k = p.key; el.hidden = false;
+  const ev = EVI[ENT[p.key].until];
+  const btns = ev.kind === "split" ? ev.successors.map(s => `<button class="btn amber" type="button" data-f="${s}">${ic("lock")}Follow ${NM(s)}</button>`).join("") : `<button class="btn amber" type="button" data-f="${ev.recipient}">${ic("lock")}Follow successor · ${NM(ev.recipient)}</button>`;
+  el.innerHTML = `<span class="lbl a">Pinned agency ended · ${fmt(ev.eff)}</span><span class="t">${ev.title}</span><div class="btnrow">${btns}<button class="btn" type="button" data-resume="1">${ic("route")}Resume tour</button><button class="btn" type="button" data-rec="${ev.id}">${ic("doc")}Final record</button></div>`;
+}
+$("pinEnd").addEventListener("click", e => {
+  const f = e.target.closest("[data-f]"), r = e.target.closest("[data-resume]"), rec = e.target.closest("[data-rec]"), hrec = e.target.closest("[data-hrec]");
+  if (hrec) { openRecordFull({ edge: +hrec.dataset.hrec }); return; }
+  if (f) { follow(f.dataset.f, "successor chosen"); S.playing = true; }
+  else if (r) { resumeTour(); S.playing = true; }
+  else if (rec) openRecord({ ev: rec.dataset.rec });
+});
+
+function onRecordText() {
+  if (S.tour === "full") return hOnRecord();
+  const T = S.T, i = currentEventIndex(T);
+  if (i < 0) return { t: EVENTS[0].approach, ph: "Lead-in · " + fmt(dateAt(T)) };
+  const ev = EVENTS[i];
+  if (T < ev.C) return { t: ev.approach, ph: "Approach · effective " + fmt(ev.eff) };
+  if (T < ev.CE) return { t: ev.title, ph: "Contact · " + fmt(ev.eff) };
+  if (T <= ev.S) return { t: ev.title, ph: "Aftermath · settled" };
+  const nx = EVENTS[i + 1];
+  if (nx) return { t: ev.title, ph: "Quiet interval · next beat " + fmtShort(nx.eff) };
+  return { t: ev.title, ph: S.ended ? "Tour complete · Replay available" : "Holding result" };
+}
+
+function tlX(ms) { const a = D("1958-01-01"), b = D("1978-01-01"); return (ms - a) / (b - a); }
+function renderTimeline() {
+  if (S.tour === "full") return renderTimelineFull();
+  const tl = $("tl"); const ms = dateAt(S.T);
+  let h = `<div class="axis">`;
+  for (const y of [1958, 1960, 1965, 1970, 1975, 1977]) h += `<span class="yr${y === 1960 || y === 1977 ? " minor" : ""}" style="left:${tlX(D(y + "-01-01")) * 100}%">${y}</span>`;
+  h += `</div>`;
+  const lanes = [["inc", "INCORPORATION", 40, "var(--cyan)"], ["spl", "SPLIT", 68, "var(--split)"]];
+  for (const [id, name, y, col] of lanes) {
+    h += `<div class="lane" style="top:${y}px"></div><span class="lane-l" style="top:${y}px;color:${col}">${ic(id === "inc" ? "merge" : "fork", "sm")}${name}</span>`;
+    for (let yr = 1958; yr <= 1977; yr++) h += `<span class="tick" style="left:${tlX(D(yr + "-01-01")) * 100}%;top:${y}px"></span>`;
+    for (const ev of EVENTS.filter(e => e.lane === id)) h += `<button type="button" class="mk ${id === "inc" ? "inc" : "spl"} ${ms < ev.eff ? "future" : ""}" style="left:${tlX(ev.eff) * 100}%;top:${y}px" data-ev="${ev.id}" aria-label="Seek to ${ev.title}, ${fmt(ev.eff)}" title="${ev.title} · ${fmt(ev.eff)}"></button>`;
+  }
+  h += `<div class="ph" style="left:${tlX(ms) * 100}%"></div>`;
+  if (tl._h !== h) { tl.innerHTML = h; tl._h = h; }
+  tl.setAttribute("aria-valuenow", new Date(ms).getUTCFullYear()); tl.setAttribute("aria-valuetext", fmt(ms));
+}
+(() => {
+  const tl = $("tl"); let wasPlaying = false, dragging = false, moved = false;
+  const msFromX = x => { const r = tl.getBoundingClientRect(), u = clamp01((x - r.left) / r.width), a = D("1958-01-01"), b = D("1978-01-01"); return a + (b - a) * u; };
+  const yFromX = x => { const r = tl.getBoundingClientRect(), u = clamp01((x - r.left) / r.width); return 1775 + u * (2027 - 1775); };
+  const go = x => S.tour === "full" ? seekY(yFromX(x)) : seek(TAt(msFromX(x)));
+  tl.addEventListener("pointerdown", e => {
+    if (e.target.closest(".mk")) return;
+    dragging = true; moved = false; wasPlaying = S.playing; S.playing = false; S.scrubbing = true; tl.setPointerCapture(e.pointerId);
+    go(e.clientX); e.preventDefault();
+  });
+  tl.addEventListener("pointermove", e => { if (!dragging) return; moved = true; go(e.clientX); });
+  const end = () => { if (!dragging) return; dragging = false; S.scrubbing = false; S.playing = wasPlaying && (S.tour === "full" ? (S.speed > 0 ? S.Y < FY1 : S.Y > FY0) : (S.speed > 0 ? S.T < TEND : S.T > 0)); log("Scrubbed to " + fmt(nowMs()) + (S.playing ? " · playing" : " · paused")); };
+  tl.addEventListener("pointerup", end); tl.addEventListener("pointercancel", end);
+  tl.addEventListener("click", e => { const m = e.target.closest(".mk"); if (!m) return; const ev = EVI[m.dataset.ev]; seek(ev.A - 0.3); log("Timeline mark · " + ev.short); });
+  tl.addEventListener("keydown", e => {
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && S.tour === "full") { e.preventDefault(); e.stopPropagation(); seekY(S.Y + (e.key === "ArrowRight" ? 1 : -1)); log("Scrubbed to " + fmt(nowMs())); return; }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); e.stopPropagation(); const d = dateAt(S.T) + (e.key === "ArrowRight" ? 1 : -1) * 182 * DAY; seek(TAt(d)); log("Scrubbed to " + fmt(dateAt(S.T))); }
+  });
+})();
+
+/* dossier */
+const embCanvas = $("emb");
+let dosSig = "";
+function selectedKey() { if (S.tour === "full") return selectedKeyFull(); return S.inspect || S.pin || (S.mode === "follow" ? S.pin : null) || (S.returnPin && S.mode === "free" ? S.returnPin : null) || autoSubject(S.T); }
+function renderDossier() {
+  if (S.tour === "full") return renderDossierFull();
+  const k = selectedKey(), e = entOf(k), ms = dateAt(S.T);
+  const st = e.ctx ? { s: "Context cell · no events in this slice", tag: "off" } : statusAt(k, ms);
+  const edges = e.ctx ? [] : edgesAt(ms).filter(x => x.from === k || x.to === k);
+  const sig = [k, st.s, S.inspect, S.pin, S.mode, edges.map(x => x.active).join(), massAt(k, ms)].join("|");
+  if (sig === dosSig) return; dosSig = sig;
+  $("selMode").innerHTML = S.inspect ? ic("lens", "sm") + " Inspecting" : S.pin === k ? ic("lock", "sm") + " Pinned" : ic("route", "sm") + " Auto select";
+  $("selMode").style.color = S.pin === k && !S.inspect ? "var(--amber)" : "";
+  $("dShort").textContent = e.name; $("dLong").textContent = "Census ID " + e.id;
+  const g = embCanvas.getContext("2d"); g.clearRect(0, 0, 112, 112); g.beginPath(); g.arc(56, 56, 50, 0, 7); g.fillStyle = e.color; g.fill();
+  g.save(); g.translate(56, 56); glyph(g, e.glyph, 58, shade(e.color, -0.55)); g.restore();
+  let kv = `<dt>Status</dt><dd><span class="tag ${st.tag}">${st.s}</span></dd>`;
+  if (e.ctx) kv += `<dt>Census ID</dt><dd class="mono">${e.id}</dd><dt>Note</dt><dd>Shown for scale and context. Excluded from rankings and records.</dd>`;
+  else kv += `<dt>Dates</dt><dd>${e.dates}</dd><dt>Parent</dt><dd>${e.parent}</dd><dt>Mass</dt><dd>${massAt(k, ms) || "—"} <span class="lbl">in this dataset</span></dd><dt>Census ID</dt><dd class="mono">${e.id}</dd>`;
+  $("dKv").innerHTML = kv;
+  $("dExpl").textContent = e.ctx ? "" : e.expl;
+  let b = "";
+  const aliveNow = e.ctx || isAlive(k, ms);
+  if (S.pin === k) b += `<button class="btn amber" type="button" data-act="unpin">${ic("close")}Stop following</button>`;
+  else if (aliveNow) b += `<button class="btn amber" type="button" data-act="follow" data-k="${k}">${ic("lock")}Follow ${e.short}</button>`;
+  if (!e.ctx) b += `<button class="btn cyan" type="button" data-act="record" data-k="${k}">${ic("doc")}Open record</button>`;
+  if (S.inspect) b += `<button class="btn" type="button" data-act="uninspect">${ic("return")}Back to camera subject</button>`;
+  $("dBtns").innerHTML = b;
+  renderLineage(k, ms, edges);
+}
+$("dBtns").addEventListener("click", ev => {
+  const t = ev.target.closest("[data-act]"); if (!t) return;
+  const a = t.dataset.act;
+  if (a === "follow") follow(t.dataset.k, "from dossier");
+  else if (a === "unpin") unpin("Pin closed by viewer");
+  else if (a === "record") openRecord({ ent: t.dataset.k });
+  else if (a === "uninspect") { S.inspect = null; log("Inspection closed"); }
+});
+function wrapTxt(t, max) { const out = []; let cur = ""; for (const w of t.split(" ")) { const n = cur ? cur + " " + w : w; if (cur && n.length > max) { out.push(cur); cur = w; } else cur = n; } if (cur) out.push(cur); return out; }
+function renderLineage(k, ms, edges) {
+  const svg = $("linSvg");
+  if (!edges.length) { svg.setAttribute("viewBox", "0 0 320 40"); svg.innerHTML = `<text x="0" y="24" fill="#6f7d78" font-family="IBM Plex Mono, monospace" font-size="11">No lineage events in this slice</text>`; $("linText").textContent = ""; $("linNote").textContent = ""; return; }
+  const LH = 12.5;
+  const nodeH = (key, w) => wrapTxt(NM(key), Math.floor((w - 12) / 6.2)).length * LH + 11;
+  const node = (key, x, y, w, active) => { const lines = wrapTxt(NM(key), Math.floor((w - 12) / 6.2)), h = lines.length * LH + 11; return `<g class="node" data-k="${key}" tabindex="0" role="button" aria-label="Inspect ${NM(key)}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#111a17" stroke="${active ? "#f2b45a" : "#2a3833"}" stroke-width="1.2"/>${lines.map((l, i) => `<text x="${x + w / 2}" y="${y + 15 + i * LH}" text-anchor="middle" fill="#dfe7e3" font-family="IBM Plex Mono, monospace" font-size="10.5">${l}</text>`).join("")}</g>`; };
+  const path = (d, active, col, id) => `<path d="${d}" fill="none" stroke="${active ? col : "#2a3833"}" stroke-width="1.6" ${active ? "" : 'stroke-dasharray="3 4"'} class="${active ? "edge-on" : ""}" data-e="${id}" pathLength="1" style="${active ? "stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset .9s ease" : ""}"/>`;
+  const lbl = (x, y, t, on) => `<text x="${x}" y="${y}" fill="${on ? "#a9b6b1" : "#6f7d78"}" font-family="IBM Plex Mono, monospace" font-size="10">${t}</text>`;
+  let h = "", text = "", H = 0;
+  const evs = [...new Set(edges.map(x => x.ev))];
+  const W = 236, X = 42, GAP = 34;
+  if (evs.length === 1 && evs[0].kind === "absorb") {
+    const ev = evs[0], on = ms >= ev.eff, h1 = nodeH(ev.donor, W), y2 = 2 + h1 + GAP, h2 = nodeH(ev.recipient, W);
+    h += path(`M${X + W / 2} ${2 + h1} L${X + W / 2} ${y2}`, on, "#f2b45a", ev.id) + lbl(X + W / 2 + 8, 2 + h1 + 21, on ? "incorporated · " + fmt(ev.eff) : "pending · " + fmt(ev.eff), on);
+    h += node(ev.donor, X, 2, W, on) + node(ev.recipient, X, y2, W, on); H = y2 + h2 + 4;
+    text = on ? (k === ev.donor ? "Ended. Successor retains its record." : "Predecessor retained in lineage.") : "Transfer pending at this date.";
+  } else if (evs.length === 1 && evs[0].kind === "split") {
+    const ev = evs[0], on = ms >= ev.eff, h1 = nodeH("AEC", W), y2 = 2 + h1 + GAP + 8, cw = 154, hN = nodeH("NRC", cw), hE = nodeH("ERDA", cw);
+    const mx = X + W / 2, my = 2 + h1 + 14, xN = 2, xE = 164;
+    h += path(`M${mx} ${2 + h1} L${mx} ${my} L${xN + cw / 2} ${my} L${xN + cw / 2} ${y2}`, on, "#d58fd6", ev.id + "n") + path(`M${mx} ${my} L${xE + cw / 2} ${my} L${xE + cw / 2} ${y2}`, on, "#f2b45a", ev.id + "e");
+    h += lbl(mx + 8, my + 13, on ? "divided · " + fmt(ev.eff) : "pending · " + fmt(ev.eff), on);
+    h += node("AEC", X, 2, W, on) + node("NRC", xN, y2, cw, on) + node("ERDA", xE, y2, cw, on); H = y2 + Math.max(hN, hE) + 4;
+    text = on ? "Two successors enter the record · " + fmt(ev.eff) : "One commission at this date · division " + fmt(ev.eff);
+  } else {
+    const [e2, e3] = [EVENTS[1], EVENTS[2]], on2 = ms >= e2.eff, on3 = ms >= e3.eff;
+    const h1 = nodeH("AEC", W), y2 = 2 + h1 + GAP, h2 = nodeH("ERDA", W), y3 = y2 + h2 + GAP, h3 = nodeH("DOE", W);
+    h += path(`M${X + W / 2} ${2 + h1} L${X + W / 2} ${y2}`, on2, "#d58fd6", "a") + lbl(X + W / 2 + 8, 2 + h1 + 21, "divided · " + fmt(e2.eff), on2);
+    h += path(`M${X + W / 2} ${y2 + h2} L${X + W / 2} ${y3}`, on3, "#f2b45a", "b") + lbl(X + W / 2 + 8, y2 + h2 + 21, on3 ? "incorporated · " + fmt(e3.eff) : "pending · " + fmt(e3.eff), on3);
+    h += node("AEC", X, 2, W, on2) + node("ERDA", X, y2, W, on2) + node("DOE", X, y3, W, on3); H = y3 + h3 + 4;
+    text = on3 ? "Transfer into the Department of Energy." : "Lineage followed into the Department of Energy on 1 Oct 1977.";
+  }
+  svg.setAttribute("viewBox", `0 0 320 ${Math.ceil(H)}`);
+  const prevOn = new Set([...svg.querySelectorAll(".edge-on")].map(p => p.dataset.e));
+  svg.innerHTML = h;
+  svg.querySelectorAll(".edge-on").forEach(p => { if (!prevOn.has(p.dataset.e) && !reduced) { p.style.transition = "none"; p.style.strokeDashoffset = "1"; p.getBoundingClientRect(); p.style.transition = "stroke-dashoffset .9s ease"; p.style.strokeDashoffset = "0"; } });
+  $("linText").textContent = text; $("linNote").textContent = "Open a node to inspect";
+}
+$("linSvg").addEventListener("click", e => { const n = e.target.closest(".node"); if (!n) return; S.inspect = n.dataset.k; log("Inspect " + NM(n.dataset.k) + " from lineage"); });
+$("linSvg").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { const n = e.target.closest(".node"); if (n) { e.preventDefault(); e.stopPropagation(); S.inspect = n.dataset.k; log("Inspect " + NM(n.dataset.k) + " from lineage"); } } });
+
+/* minimap */
+const mini = $("mini"), mctx = mini.getContext("2d");
+function renderMini(cells) {
+  if (S.tour === "full") return renderMiniFull(cells);
+  const W = mini.width, H = mini.height, sx = W / WORLD.w, sy = H / WORLD.h * (WORLD.h / WORLD.w) * (W / H) ;
+  const s = Math.min(W / WORLD.w, H / (WORLD.h * 0.75)) ;
+  mctx.fillStyle = "#111a17"; mctx.fillRect(0, 0, W, H);
+  const ox = (W - WORLD.w * s) / 2, oy = (H - WORLD.h * s) / 2; mini._t = { s, ox, oy };
+  mctx.strokeStyle = "#1c2924"; mctx.lineWidth = 1; mctx.beginPath();
+  for (let x = 0; x <= WORLD.w; x += 200) { mctx.moveTo(ox + x * s, oy); mctx.lineTo(ox + x * s, oy + WORLD.h * s); }
+  for (let y = 0; y <= WORLD.h; y += 200) { mctx.moveTo(ox, oy + y * s); mctx.lineTo(ox + WORLD.w * s, oy + y * s); }
+  mctx.stroke();
+  for (const c of cells) { if (c.childOfNeck) continue; mctx.globalAlpha = c.a; mctx.beginPath(); mctx.arc(ox + c.x * s, oy + c.y * s, Math.max(3, c.r * s * 0.9), 0, 7); mctx.fillStyle = c.slice ? c.color : "#7d8a86"; mctx.fill(); }
+  if (cells.some(c => c.neck)) { for (const k of ["ERDA", "NRC"]) { const p = splitChildPos(k, S.T); mctx.beginPath(); mctx.arc(ox + p[0] * s, oy + p[1] * s, Math.max(3, R0 * s * 0.9), 0, 7); mctx.fillStyle = ENT[k].color; mctx.fill(); } }
+  mctx.globalAlpha = 1;
+  const vw = AW / cam.z, vh = AH / cam.z;
+  mctx.strokeStyle = "#f2b45a"; mctx.lineWidth = 2; mctx.strokeRect(ox + (cam.x - vw / 2) * s, oy + (cam.y - vh / 2) * s, vw * s, vh * s);
+}
+mini.addEventListener("click", e => {
+  const r = mini.getBoundingClientRect(), t = mini._t; if (!t) return;
+  const px = (e.clientX - r.left) * mini.width / r.width, py = (e.clientY - r.top) * mini.height / r.height;
+  const wx = (px - t.ox) / t.s, wy = (py - t.oy) / t.s;
+  if (S.mode === "follow") S.returnPin = S.pin;
+  const Wd = S.tour === "full" ? HWORLD : WORLD; S.mode = "free"; S.pin = null; cam.x = Math.max(0, Math.min(Wd.w, wx)); cam.y = Math.max(0, Math.min(Wd.h, wy));
+  log("Minimap · free view at " + Math.round(wx) + ", " + Math.round(wy));
+});
+
+function renderLog() {
+  $("log").innerHTML = LOG.slice(-14).map(l => `<li class="${l.sys ? "sys" : ""}"><span class="d"></span><span class="ts">${l.ts}</span><span>${l.text}</span></li>`).join("");
+  $("log").scrollTop = 1e6;
+}
+
+/* workspaces */
+function setTab(t, quiet) {
+  if (t === S.tab) return;
+  S.tab = t;
+  document.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  for (const w of ["entities", "lineage", "records"]) $("ws-" + w).hidden = w !== t;
+  renderWorkspace(true);
+  if (!quiet) log("Workspace · " + t[0].toUpperCase() + t.slice(1));
+}
+document.querySelector(".tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); });
+let wsSig = "", entFilter = "";
+function renderWorkspace(force) {
+  if (S.tour === "full") return renderWorkspaceFull(force);
+  if (S.tab === "arena") return;
+  const ms = dateAt(S.T), sig = S.tab + "|" + Math.floor(ms / DAY) + "|" + entFilter + "|" + S.pin;
+  if (sig === wsSig && !force) return; wsSig = sig;
+  const el = $("ws-" + S.tab);
+  if (S.tab === "entities") {
+    const act = activeSliceAt(ms);
+    const ranked = Object.keys(ENT).filter(k => isAlive(k, ms)).sort((a, b) => massAt(b, ms) - massAt(a, ms) || a.localeCompare(b));
+    const match = k => { const e = entOf(k), q = entFilter.trim().toLowerCase(); return !q || (e.abbr + " " + e.name + " " + e.id).toLowerCase().includes(q); };
+    const yrN = new Date(ms).getUTCFullYear();
+    let h = `<h3>Entities · ${fmt(ms)}</h3><div class="lbl c">Verified active in this slice: ${act.length} · Mass in this dataset, not budget or staff</div><div class="kv" style="grid-template-columns:200px 1fr"><dt>Discovered in census</dt><dd class="mono">8,447 units (v0.2 draft)</dd><dt>Dated and live in ${yrN}</dt><dd class="mono">${(DATED_LIVE[yrN] || 0).toLocaleString("en-US")} units · unverified</dd><dt>Playable in this slice</dt><dd class="mono">6 agencies · 3 reviewed events</dd></div>`;
+    h += `<label class="lbl" for="entq" style="display:inline-flex;gap:6px;align-items:center">${ic("search", "sm")}Search agencies</label><input id="entq" type="search" value="${entFilter.replace(/"/g, "&quot;")}" placeholder="Name, acronym or census ID" autocomplete="off">`;
+    h += `<table><thead><tr><th>#</th><th>Agency</th><th>Status at playhead</th><th>Mass</th><th></th></tr></thead><tbody>`;
+    ranked.filter(match).forEach((k, i) => { const e = ENT[k], st = statusAt(k, ms); h += `<tr><td class="mono">${i + 1}</td><td><b>${e.name}</b><br><span class="mono" style="color:var(--dim)">${e.id}</span></td><td><span class="tag ${st.tag}">${st.s}</span></td><td class="mono">${massAt(k, ms)}</td><td><button class="btn" type="button" data-follow="${k}">${ic("lock")}${S.pin === k ? "Following" : "Follow"}</button></td></tr>`; });
+    h += `</tbody></table>`;
+    const ended = Object.keys(ENT).filter(k => !isAlive(k, ms) && match(k));
+    if (ended.length) h += `<div class="lbl">Not live at this date</div><table><tbody>${ended.map(k => `<tr><td><b>${ENT[k].name}</b></td><td><span class="tag off">${statusAt(k, ms).s}</span></td><td><button class="btn" type="button" data-inspect="${k}">${ic("lens")}Inspect</button></td></tr>`).join("")}</tbody></table>`;
+    h += `<div class="lbl">Context cells · real census units shown for scale, no events in this slice, not ranked</div><table><tbody>${Object.keys(CTX).filter(match).map(k => `<tr><td><b>${CTX[k].name}</b></td><td class="mono" style="color:var(--dim)">${CTX[k].id}</td><td><button class="btn" type="button" data-follow="${k}">${ic("lock")}Follow</button></td></tr>`).join("")}</tbody></table>`;
+    const focusQ = document.activeElement && document.activeElement.id === "entq"; const caret = focusQ ? document.activeElement.selectionStart : 0;
+    el.innerHTML = h;
+    if (focusQ) { const q = $("entq"); q.focus(); q.setSelectionRange(caret, caret); }
+  } else if (S.tab === "lineage") {
+    const edges = edgesAt(ms);
+    el.innerHTML = `<h3>Lineage · ${fmt(ms)}</h3><div class="lbl">Dated relationships. Edges appear when the playhead reaches their event.</div><table><thead><tr><th>Effective</th><th>From</th><th>Relation</th><th>To</th><th>At playhead</th><th></th></tr></thead><tbody>${edges.map(x => `<tr><td class="mono">${fmt(x.ev.eff)}</td><td><button class="btn" type="button" data-inspect="${x.from}">${NM(x.from)}</button></td><td>${x.label}</td><td><button class="btn" type="button" data-inspect="${x.to}">${NM(x.to)}</button></td><td><span class="tag ${x.active ? "on" : "off"}">${x.active ? "Recorded" : "Not yet reached"}</span></td><td><button class="btn cyan" type="button" data-rec="${x.ev.id}">${ic("doc")}Record</button></td></tr>`).join("")}</tbody></table>`;
+  } else if (S.tab === "records") {
+    el.innerHTML = `<h3>Records</h3><div class="lbl">Chronological reviewed events · text equivalent of the feed</div><table><thead><tr><th>Effective</th><th>Event</th><th>Authority</th><th>Review</th></tr></thead><tbody>${EVENTS.map(ev => `<tr><td class="mono">${fmt(ev.eff)}<br><span style="color:var(--dim)">day precision</span></td><td><b>${ev.title}</b><br><span style="color:var(--ink-2)">${ev.kind === "split" ? "Split" : "Absorption"} · <span class="mono">${ev.id}</span> · ${ev.census}</span><div class="acts"><button class="btn" type="button" data-seekev="${ev.id}">${ic("skip")}Seek</button><button class="btn cyan" type="button" data-rec="${ev.id}">${ic("doc")}Sources</button></div></td><td style="color:var(--ink-2)">${ev.authority}</td><td><span class="tag ${ms >= ev.eff ? "on" : "off"}">${ms >= ev.eff ? "On record at playhead" : "Ahead of playhead"}</span><br><span class="lbl">Slice fixture · sources checked</span></td></tr>`).join("")}</tbody></table>
+    <div class="lbl">Decoration register</div><div style="color:var(--ink-2)">P-001 and all other pellets are presentation-layer ornament. Pellet events in the historical dataset: 0.</div>`;
+  }
+}
+$("stage").addEventListener("input", e => { if (e.target.id === "entq") { entFilter = e.target.value; renderWorkspace(true); } });
+$("stage").addEventListener("click", e => {
+  const f = e.target.closest("[data-follow]"), i = e.target.closest("[data-inspect]"), r = e.target.closest("[data-rec]"), s = e.target.closest("[data-seekev]");
+  const hr = e.target.closest("[data-hrec]"), hs = e.target.closest("[data-hseekb]"), hu = e.target.closest("[data-hrecu]");
+  if (hr) { openRecordFull({ edge: +hr.dataset.hrec }); return; }
+  if (hu) { openRecordFull({ ent: hu.dataset.hrecu }); return; }
+  if (hs) { const b = HB[+hs.dataset.hseekb]; seekY(b.t - LEAD); log("Records · seek to " + b.title); return; }
+  if (f) { follow(f.dataset.follow, "from Entities"); setTab("arena", true); }
+  else if (i) { S.inspect = i.dataset.inspect; log("Inspect " + NM(i.dataset.inspect)); }
+  else if (r) openRecord({ ev: r.dataset.rec });
+  else if (s) { const ev = EVI[s.dataset.seekev]; seek(ev.A - 0.3); log("Records · seek to " + ev.short); }
+});
+
+/* record drawer + exhibit */
+function openRecord(o) {
+  if (S.tour === "full") return openRecordFull(o);
+  const d = $("drawer"); let h = `<div class="dhead"><span class="lbl c" style="display:inline-flex;gap:6px;align-items:center">${ic("doc", "sm")}Record drawer</span><button class="btn" type="button" id="drawerClose">${ic("close", "sm")}Close · Esc</button></div>`;
+  const srcBlock = c => { const s = SRC[c.src]; return `<div class="src"><span class="st">${s.status.toUpperCase()}</span><b>${s.title}</b><span style="color:var(--ink-2)">${s.publisher} · ${c.loc || s.locator}</span><blockquote>${c.q}</blockquote><a href="${s.url}" target="_blank" rel="noopener" style="display:inline-flex;gap:6px;align-items:center">${ic("external", "sm")}Open source</a></div>`; };
+  if (o.ev) {
+    const ev = EVI[o.ev];
+    h += `<h3 id="drawerTitle">${ev.title}</h3><dl class="kv"><dt>Event ID</dt><dd class="mono">${ev.id}</dd><dt>Kind</dt><dd>${ev.kind === "split" ? "Split · one end, two starts" : "Absorption · full succession"}</dd><dt>Effective</dt><dd>${fmt(ev.eff)} · day precision · operations changed</dd><dt>Enacted</dt><dd>${fmt(ev.enacted)} · statute signed</dd><dt>Authority</dt><dd>${ev.authority}</dd><dt>Dataset edge</dt><dd class="mono">${ev.census}</dd><dt>Review</dt><dd>Slice fixture. The dataset dates this edge by statute; the tour plays it on the operations date from the cited source, checked 19 Nov 2026. Dataset ${DATASET_PIN}.</dd></dl>`;
+    if (ev.note) h += `<p class="expl">${ev.note}</p>`;
+    h += ev.claims.map(srcBlock).join("");
+    log("Record opened · " + ev.short);
+  } else {
+    const k = o.ent, e = ENT[k];
+    h += `<h3 id="drawerTitle">${e.name}</h3><dl class="kv"><dt>Census ID</dt><dd class="mono">${e.id}</dd><dt>Dates</dt><dd>${e.dates}</dd><dt>Parent</dt><dd>${e.parent}</dd><dt>Citation</dt><dd>${e.cite.loc}<br><a href="${e.cite.url}" target="_blank" rel="noopener" style="display:inline-flex;gap:6px;align-items:center">${ic("external", "sm")}Open primary citation</a></dd></dl><p class="expl">${e.expl}</p>`;
+    for (const ev of EVENTS.filter(x => involves(x, k))) h += `<button class="btn cyan" type="button" data-rec2="${ev.id}">${ic("doc")}${ev.title} · ${fmt(ev.eff)}</button>`;
+    log("Record opened · " + NM(k));
+  }
+  d.innerHTML = h; d.hidden = false; $("drawerClose").focus();
+}
+$("drawer").addEventListener("click", e => { if (e.target.closest("#drawerClose")) closeDrawer(); const r = e.target.closest("[data-rec2]"); if (r) openRecord({ ev: r.dataset.rec2 }); });
+function closeDrawer() { $("drawer").hidden = true; arena.focus({ preventScroll: true }); }
+function pelletCrop(scale) {
+  const N = 24, src = document.createElement("canvas"); src.width = N; src.height = N;
+  renderWorld(src.getContext("2d"), N, N, { x: Math.round(P001.x), y: Math.round(P001.y), z: 1 }, 0);
+  const out = document.createElement("canvas"); out.width = N * scale; out.height = N * scale;
+  const o = out.getContext("2d"); o.imageSmoothingEnabled = false; o.drawImage(src, 0, 0, N * scale, N * scale);
+  return { src, out };
+}
+function drawExhibitThumb() { const { src } = pelletCrop(1), g = $("pellet").getContext("2d"); g.imageSmoothingEnabled = false; g.drawImage(src, 0, 0, 72, 72); }
+$("exhibitBtn").addEventListener("click", () => {
+  const { out } = pelletCrop(10); out.className = "xl";
+  const d = $("drawer");
+  d.innerHTML = `<div class="dhead"><span class="lbl c" style="display:inline-flex;gap:6px;align-items:center">${ic("lens", "sm")}Material exhibit</span><button class="btn" type="button" id="drawerClose">${ic("close", "sm")}Close · Esc</button></div><h3 id="drawerTitle">P-001</h3>`;
+  d.appendChild(out);
+  d.insertAdjacentHTML("beforeend", `<dl class="kv"><dt>Object class</dt><dd>One pellet</dd><dt>Historical effect</dt><dd style="color:var(--amber)">None recorded</dd><dt>Source</dt><dd class="mono">Arena render · world ${Math.round(P001.x)}, ${Math.round(P001.y)} · 24 × 24 px at 1:1 · nearest-neighbor ×10</dd><dt>Seed</dt><dd class="mono">pellet field 1958 · unobstructed for the whole tour</dd><dt>Counts</dt><dd>Excluded from institutional counts, lanes and records. Pellet events in the dataset: 0.</dd></dl>`);
+  d.hidden = false; $("drawerClose").focus();
+  log("Material exhibit P-001 opened");
+});
+
+/* ================= ARENA INPUT ================= */
+(() => {
+  const pts = new Map(); let down = null, moved = false, pinch = null;
+  const toWorld = (sx, sy) => [cam.x + (sx - AW / 2) / cam.z, cam.y + (sy - AH / 2) / cam.z];
+  const rel = e => { const r = arena.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  function enterFree(why) { if (S.mode !== "free") { if (S.mode === "follow") S.returnPin = S.pin; S.pin = null; S.mode = "free"; log(why); } }
+  arena.addEventListener("pointerdown", e => { arena.setPointerCapture(e.pointerId); pts.set(e.pointerId, rel(e)); down = { p: rel(e), cam: { ...cam } }; moved = false; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z: cam.z }; } });
+  arena.addEventListener("pointermove", e => {
+    if (!pts.has(e.pointerId)) return; const p = rel(e); pts.set(e.pointerId, p);
+    if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; const w = toWorld(...mid); cam.z = Math.max(zMin(), Math.min(3, pinch.z * d / pinch.d)); cam.x = w[0] - (mid[0] - AW / 2) / cam.z; cam.y = w[1] - (mid[1] - AH / 2) / cam.z; enterFree("Pinch zoom · free view"); moved = true; return; }
+    if (!down) return; const dx = p[0] - down.p[0], dy = p[1] - down.p[1];
+    if (!moved && Math.hypot(dx, dy) > 5) { moved = true; enterFree("Drag · free view"); down.cam = { ...cam }; down.p = p; arena.classList.add("dragging"); return; }
+    if (moved) { cam.x = down.cam.x - (p[0] - down.p[0]) / cam.z; cam.y = down.cam.y - (p[1] - down.p[1]) / cam.z; }
+  });
+  const up = e => {
+    pts.delete(e.pointerId); if (pts.size < 2) pinch = null; arena.classList.remove("dragging");
+    if (down && !moved && pts.size === 0) clickAt(...down.p);
+    if (pts.size === 0) down = null;
+  };
+  arena.addEventListener("pointerup", up); arena.addEventListener("pointercancel", up);
+  arena.addEventListener("wheel", e => {
+    e.preventDefault(); const p = rel(e), w = toWorld(...p);
+    enterFree("Zoom · free view");
+    cam.z = Math.max(zMin(), Math.min(3, cam.z * Math.exp(-e.deltaY * 0.0015)));
+    cam.x = w[0] - (p[0] - AW / 2) / cam.z; cam.y = w[1] - (p[1] - AH / 2) / cam.z;
+  }, { passive: false });
+  function clickAt(sx, sy) {
+    if (S.tour === "full") {
+      const [wx, wy] = toWorld(sx, sy); let hit = null;
+      for (const c of S.hcells) if (c.a > 0.3 && Math.hypot(c.x - wx, c.y - wy) < Math.max(c.r, 7 / cam.z) && (!hit || c.r > hit.r)) hit = c;
+      if (!hit) return;
+      if (S.pin === hit.key) { openRecordFull({ ent: hit.key }); return; }
+      follow(hit.key, "clicked in arena"); return;
+    }
+    const [wx, wy] = toWorld(sx, sy), cells = cellsAt(S.T).filter(c => c.a > 0.3);
+    let hit = null;
+    for (const c of cells) {
+      if (c.childOfNeck) continue;
+      if (c.neck) { for (const k of ["ERDA", "NRC"]) { const p = splitChildPos(k, S.T); if (Math.hypot(p[0] - wx, p[1] - wy) < R0) hit = { key: k }; } if (S.T - EVENTS[1].C < 0.2 && Math.hypot(c.x - wx, c.y - wy) < c.r) hit = { key: "AEC" }; continue; }
+      if (Math.hypot(c.x - wx, c.y - wy) < c.r) hit = c;
+    }
+    if (!hit) return;
+    if (S.pin === hit.key) { if (ENT[hit.key]) openRecord({ ent: hit.key }); return; }
+    follow(hit.key, "clicked in arena");
+  }
+  window.__fcScreenOfFull = k => { const c = S.hcells.find(q => q.key === k); if (!c) return null; const r = arena.getBoundingClientRect(); return [r.left + AW / 2 + (c.x - cam.x) * cam.z, r.top + AH / 2 + (c.y - cam.y) * cam.z]; };
+  window.__fcScreenOf = k => { const c = cellsAt(S.T).find(q => q.key === k && !q.childOfNeck); if (!c) return null; const r = arena.getBoundingClientRect(); return [r.left + AW / 2 + (c.x - cam.x) * cam.z, r.top + AH / 2 + (c.y - cam.y) * cam.z]; };
+})();
+
+/* transport */
+$("play").addEventListener("click", () => setPlaying(!S.playing));
+$("startBtn").addEventListener("click", () => { setPlaying(true); arena.focus({ preventScroll: true }); });
+$("prev").addEventListener("click", () => stepEvent(-1));
+$("next").addEventListener("click", () => stepEvent(1));
+$("replay").addEventListener("click", replay);
+function speedMenu(open) {
+  const m = $("speedMenu"), b = $("speedBtn");
+  if (open) { const r = b.getBoundingClientRect(); m.hidden = false; const h = m.offsetHeight; m.style.left = Math.max(8, Math.min(innerWidth - m.offsetWidth - 8, r.left)) + "px"; m.style.top = (r.top - h - 6 > 8 ? r.top - h - 6 : r.bottom + 6) + "px"; b.setAttribute("aria-expanded", "true"); (m.querySelector('[aria-checked="true"]') || m.querySelector("button")).focus(); }
+  else { m.hidden = true; b.setAttribute("aria-expanded", "false"); }
+}
+function setSpeed(v) {
+  if (v === S.speed) return; const wasRev = S.speed < 0; S.speed = v;
+  log("Speed " + (v < 0 ? "−" + Math.abs(v) : v) + "×" + (v < 0 ? " · reverse" : v >= 10 ? " · fast-forward" : v < 0.5 ? " · comically slow" : ""));
+  if (v < 0 && !wasRev) S.ended = false;
+}
+$("speedBtn").addEventListener("click", () => speedMenu($("speedMenu").hidden));
+$("speedMenu").addEventListener("click", e => { const b = e.target.closest("[data-speed]"); if (!b) return; setSpeed(+b.dataset.speed); speedMenu(false); $("speedBtn").focus(); });
+$("speedMenu").addEventListener("keydown", e => {
+  const items = [...$("speedMenu").querySelectorAll("button")], i = items.indexOf(document.activeElement);
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); e.stopPropagation(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); }
+  else if (e.key === "Escape") { e.stopPropagation(); speedMenu(false); $("speedBtn").focus(); }
+});
+document.addEventListener("pointerdown", e => { if (!$("speedMenu").hidden && !e.target.closest("#speed") && !e.target.closest("#speedMenu")) speedMenu(false); });
+function tourLabels() {
+  const full = S.tour === "full";
+  $("dsv").textContent = full ? HDATASET : DATASET;
+  $("ftds").textContent = full ? `Dataset ${HDATASET} · graph.json sha256 ${HIST.meta.sha} · ${HIST.meta.used_units.toLocaleString("en-US")} dated agencies · ${HB.length} marked events · draft, unverified except 3 reviewed` : "Dataset " + DATASET + " · " + DATASET_PIN.split(" · ")[0] + " · 3 reviewed events · " + Object.keys(ENT).length + " slice agencies";
+  $("tlNote").textContent = full ? `${HB.length} marked events · founded per year · draft census` : "3 reviewed records · dates linear";
+  $("speedNorm").textContent = full ? "Normal · one year per second" : "Normal";
+  document.querySelectorAll("[data-tour]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tour === S.tour)));
+}
+function setTour(t, quiet) {
+  if (t === S.tour) return;
+  S.tour = t; S.playing = false; S.pin = null; S.returnPin = null; S.inspect = null; S.mode = "auto"; S.pinEnd = null; S.railPick = null; S.dismissed.clear(); S.ended = false;
+  railSig = ""; dosSig = ""; hDosSig = ""; wsSig = ""; hWsSig = ""; noticeSig = ""; $("notice").hidden = true; $("pinEnd").hidden = true; $("pinEnd")._k = null;
+  const tl = $("tl"); tl._h = null; tl.innerHTML = ""; $("drawer").hidden = true; snapCam = true; WRAP.clear();
+  if (t === "slice") { S.T = Math.min(S.T, TEND); } 
+  tourLabels(); renderWorkspace(true); renderRail(true);
+  if (!quiet) log("Tour · " + (t === "full" ? "Full history 1775–2026" : "Reviewed slice 1958–1977"));
+}
+$("tour").addEventListener("click", e => { const b = e.target.closest("[data-tour]"); if (b) setTour(b.dataset.tour); });
+$("openRail").addEventListener("click", () => $("rail").classList.toggle("open"));
+$("openDos").addEventListener("click", () => $("dossier").classList.toggle("open"));
+document.addEventListener("keydown", e => {
+  const tag = (e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea") { if (e.key === "Escape") e.target.blur(); return; }
+  if (e.key === " " && (e.target === arena || e.target === document.body)) { e.preventDefault(); setPlaying(!S.playing); }
+  else if (e.key === "ArrowRight" && e.target !== $("tl")) { e.preventDefault(); stepEvent(1); }
+  else if (e.key === "ArrowLeft" && e.target !== $("tl")) { e.preventDefault(); stepEvent(-1); }
+  else if (e.key === "Escape") {
+    if (!$("speedMenu").hidden) speedMenu(false);
+    else if (!$("drawer").hidden) closeDrawer();
+    else if (S.tab !== "arena") setTab("arena");
+    else if (S.inspect) { S.inspect = null; log("Inspection closed"); }
+    else if ($("rail").classList.contains("open")) $("rail").classList.remove("open");
+    else if ($("dossier").classList.contains("open")) $("dossier").classList.remove("open");
+  }
+});
+
+/* ================= MAIN LOOP ================= */
+let lastT = 0, lastFrame = performance.now();
+function minHoldRate(T, rate) { for (const ev of EVENTS) if (T >= ev.C - 0.4 && T <= ev.S) return Math.sign(rate) * Math.min(Math.abs(rate), 1); return rate; }
+function readouts(ms) {
+  $("yr").textContent = new Date(ms).getUTCFullYear(); $("fulldate").textContent = fmt(ms); $("stamp").textContent = fmt(ms).toUpperCase();
+  { const want = S.playing ? "#i-pause" : S.speed < 0 ? "#i-rewind" : "#i-play", u = $("playUse"); if (u.getAttribute("href") !== want) u.setAttribute("href", want); }
+  $("playLbl").textContent = S.playing ? "Pause" : S.speed < 0 ? "Play backward" : (S.ended ? "Play again" : S.started ? "Resume" : "Play history");
+  const sv = (S.speed < 0 ? "−" + Math.abs(S.speed) : S.speed) + "×"; if ($("speedVal").textContent !== sv) $("speedVal").textContent = sv;
+  $("speedMenu").querySelectorAll("[data-speed]").forEach(b => { const on = String(+b.dataset.speed === S.speed); if (b.getAttribute("aria-checked") !== on) b.setAttribute("aria-checked", on); });
+  $("replay").classList.toggle("hot", S.ended);
+  const r = onRecordText(); if ($("onrec").textContent !== r.t) $("onrec").textContent = r.t; $("phaseTag").textContent = r.ph;
+  renderOwner(); renderNotice(); renderPinEnd(); renderRail(); renderDossier(); renderTimeline(); renderWorkspace();
+}
+function tickFull(dt) {
+  if (S.playing && !S.scrubbing) {
+    const prev = S.Y; let rate = S.speed;
+    if (Math.abs(rate) <= 2) { const b = HB[Math.max(0, hBeatIdx(S.Y + 0.45))]; if (b && Math.abs(S.Y - b.t) < 0.45) rate *= 0.5; }
+    S.Y = Math.max(FY0, Math.min(FY1, S.Y + dt * rate));
+    if (S.Y > prev) for (let i = Math.max(0, hBeatIdx(prev)); i < HB.length && HB[i].t <= S.Y; i++) if (HB[i].t > prev) log(HB[i].title + " · " + fmtY(HB[i].t), true);
+    const pu = hkey(S.pin);
+    if (pu && pu.t1 !== null && prev < pu.t1 && S.Y >= pu.t1) { S.playing = false; S.pinEnd = { key: S.pin }; log(pu.name + " ended while pinned · holding", true); }
+    if (rate > 0 && S.Y >= FY1) { S.playing = false; S.ended = true; log("History complete · " + fmtY(FY1) + " reached", true); }
+    if (rate < 0 && S.Y <= FY0) { S.playing = false; log("Rewind complete · back at 1775", true); }
+    if (rate < 0) S.ended = false;
+  }
+  const pu = hkey(S.pin);
+  if (pu && S.Y < pu.t0) { log(pu.name + " not yet established at " + fmtY(S.Y) + " · pin released", true); S.pin = null; S.mode = "auto"; S.pinEnd = null; }
+  else if (pu && !hAlive(pu, S.Y) && !S.pinEnd) S.pinEnd = { key: S.pin };
+  if (S.pinEnd && pu && hAlive(pu, S.Y)) S.pinEnd = null;
+  const cells = hCells(S.Y); S.hcells = cells;
+  let target = null;
+  if (S.mode === "auto") target = hAuto(S.Y, AW, AH, cells);
+  else if (S.mode === "follow") { target = hFollow(S.pin, S.Y, AW, AH); if (!target && pu) { const ids = pu.into.length ? pu.into : [pu.i]; target = hBounds(ids.map(i => hPosAny(HU[i], S.Y)), 0.8, AW, AH); } }
+  if (target) {
+    if (snapCam || reduced) { Object.assign(cam, target); snapCam = false; }
+    else { const k = 1 - Math.exp(-dt * (Math.abs(S.speed) >= 10 && S.playing ? 7 : 4.2)); cam.x += (target.x - cam.x) * k; cam.y += (target.y - cam.y) * k; cam.z = Math.exp(Math.log(cam.z) + (Math.log(target.z) - Math.log(cam.z)) * k); }
+  }
+  actx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  renderFull(actx, AW, AH, cam, S.Y, cells, { pin: S.pin });
+  renderMini(cells);
+  readouts(yToMs(S.Y));
+}
+function tick(now) {
+  const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+  if (S.tour === "full") { tickFull(dt); requestAnimationFrame(tick); return; }
+  if (S.playing && !S.scrubbing) {
+    const prev = S.T; S.T = Math.max(0, Math.min(TEND, S.T + dt * minHoldRate(S.T, S.speed)));
+    for (const ev of EVENTS) if (prev < ev.C && S.T >= ev.C) log(ev.short + " registered · " + fmt(ev.eff), true);
+    if (S.pin && ENT[S.pin]) { const e = ENT[S.pin]; if (e.until) { const ev = EVI[e.until]; if (prev < ev.CE && S.T >= ev.CE) { S.playing = false; S.pinEnd = { key: S.pin }; log(NM(S.pin) + " ended while pinned · holding", true); } } }
+    if (S.speed > 0 && S.T >= TEND) { S.playing = false; S.ended = true; log("Tour complete · result held", true); }
+    if (S.speed < 0) { S.ended = false; if (S.T <= 0) { S.playing = false; log("Rewind complete · start of tour", true); } }
+    lastT = S.T;
+  }
+  if (S.pin && ENT[S.pin] && !isAlive(S.pin, dateAt(S.T)) && !S.pinEnd) {
+    const e = ENT[S.pin]; if (e.until && S.T >= EVI[e.until].CE) S.pinEnd = { key: S.pin };
+  }
+  if (S.pinEnd && S.pin && isAlive(S.pin, dateAt(S.T))) S.pinEnd = null;
+  /* camera */
+  let target = null;
+  if (S.mode === "auto") target = autoTarget(S.T, AW, AH);
+  else if (S.mode === "follow") { target = followTarget(S.pin, S.T, AW, AH); if (!target && S.pinEnd) { const ev = EVI[ENT[S.pin].until]; target = ev.kind === "split" ? evFrame(ev, S.T, "settle", AW, AH) : followTarget(ev.recipient, S.T, AW, AH); } }
+  if (target) {
+    if (snapCam || reduced) { Object.assign(cam, target); snapCam = false; }
+    else { const k = 1 - Math.exp(-dt * 4.2); cam.x += (target.x - cam.x) * k; cam.y += (target.y - cam.y) * k; cam.z = Math.exp(Math.log(cam.z) + (Math.log(target.z) - Math.log(cam.z)) * k); }
+  }
+  const cells = cellsAt(S.T);
+  actx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  renderWorld(actx, AW, AH, cam, S.T, { cells, pin: S.pin });
+  renderMini(cells);
+  readouts(dateAt(S.T));
+  requestAnimationFrame(tick);
+}
+
+/*@@HIST@@*/
+/*@@FULL@@*/
+/* ================= TEST / INSPECTION HOOK (read-only) ================= */
+window.FC = {
+  state() {
+    const ms = dateAt(S.T), idx = railEventIdx(), ev = EVENTS[idx];
+    return {
+      T: +S.T.toFixed(3), date: new Date(ms).toISOString().slice(0, 10), playing: S.playing, mode: S.mode, pin: S.pin, returnPin: S.returnPin, ended: S.ended,
+      alive: Object.keys(ENT).filter(k => isAlive(k, ms)), operating: activeSliceAt(ms), mass: Object.fromEntries(Object.keys(ENT).filter(k => isAlive(k, ms)).map(k => [k, massAt(k, ms)])),
+      edges: edgesAt(ms).filter(e => e.active).map(e => e.from + ">" + e.to),
+      visibleCells: cellsAt(S.T).filter(c => c.slice && !c.childOfNeck && c.a > 0.3).map(c => c.key).concat(cellsAt(S.T).some(c => c.neck) ? ["ERDA*", "NRC*"] : []),
+      rail: { event: ev.id, slots: [...document.querySelectorAll("#slots .slot")].map(s => s.dataset.slot + ":" + (s.dataset.filed === "true" ? "filed" : "pending")) },
+      notice: $("notice").hidden ? null : $("noticeText").textContent,
+      dossier: selectedKey(), dossierName: $("dShort").textContent, lineageText: $("linText").textContent, onRecord: $("onrec").textContent,
+      cam: { x: Math.round(cam.x), y: Math.round(cam.y), z: +cam.z.toFixed(3) }, arena: [AW, AH],
+      log: LOG.map(l => (l.sys ? "[sys] " : "") + l.text)
+    };
+  },
+  screenOf: k => window.__fcScreenOf(k),
+  inView(k) { const c = cellsAt(S.T).find(q => q.key === k && !q.childOfNeck); let x, y, r = R0; if (c) { x = c.x; y = c.y; r = c.r; } else if (k === "ERDA" || k === "NRC") { [x, y] = splitChildPos(k, S.T); } else return false; const sx = AW / 2 + (x - cam.x) * cam.z, sy = AH / 2 + (y - cam.y) * cam.z; return sx - r * cam.z * 0.5 > 0 && sx + r * cam.z * 0.5 < AW && sy - r * cam.z * 0.5 > 0 && sy + r * cam.z * 0.5 < AH; },
+  events: EVENTS.map(e => ({ id: e.id, A: e.A, C: e.C, CE: e.CE, S: e.S })), phases: Object.fromEntries(EVENTS.map(e => [e.id, RAIL_PHASES[e.kind](e)])), TEND,
+  tour: () => S.tour, setTour: t => setTour(t), speed: () => S.speed, setSpeed: v => setSpeed(v),
+  full: {
+    state() { const y = S.Y; return { Y: +y.toFixed(4), date: new Date(yToMs(y)).toISOString().slice(0, 10), playing: S.playing, speed: S.speed, mode: S.mode, pin: S.pin, pinName: S.pin ? NM(S.pin) : null, ended: S.ended, alive: S.hcells.length, beat: hBeatIdx(y + LEAD), onRecord: $("onrec").textContent, dossier: selectedKeyFull(), dossierName: $("dShort").textContent, notice: $("notice").hidden ? null : $("noticeText").textContent, pinEnd: !$("pinEnd").hidden, rail: [...document.querySelectorAll("#slots .slot")].map(s => s.dataset.slot + ":" + (s.dataset.filed === "true" ? "filed" : "pending")), cam: { x: Math.round(cam.x), y: Math.round(cam.y), z: +cam.z.toFixed(3) }, log: LOG.map(l => (l.sys ? "[sys] " : "") + l.text) }; },
+    keyOf: id => { const u = HBYID.get(id); return u ? u.key : null; },
+    snapshot(y) { return hCells(y).map(c => c.key + ":" + Math.round(c.x) + "," + Math.round(c.y) + "," + Math.round(c.r)).join(";"); },
+    aliveIds: y => hCells(y).map(c => c.u.id), beats: () => HB.map(b => ({ i: b.i, t: b.t, title: b.title, reviewed: b.reviewed })), FY0, FY1, seekDate: s => seekY(msToY(D(s))), seekY: y => seekY(y),
+    screenOf: k => window.__fcScreenOfFull(k), meta: HIST.meta
+  },
+  dateToT: s => TAt(D(s)), _seek: t => seek(t), _auto: (t, W, H) => autoTarget(t, W, H), pellet: () => P001, captureKeys: () => [...capCache.keys()]
+};
+
+tourLabels();
+log("Feed acquired · " + DATASET, true);
+resize(); setTab("arena", true); drawExhibitThumb();
+if (document.fonts) document.fonts.ready.then(() => { WRAP.clear(); drawExhibitThumb(); });
+requestAnimationFrame(t => { lastFrame = t; tick(t); });
+</script>

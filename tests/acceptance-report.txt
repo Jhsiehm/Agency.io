@@ -1,0 +1,73 @@
+== Run A: press Play history once, hands off
+A sample T: 2.05/1958-09-27 3/1958-10-01 4.55/1958-10-07 11.516/1975-01-17 12.25/1975-01-19 13.716/1975-01-25 18.066/1977-09-28 18.766/1977-10-01 20.349/1977-10-07
+PASS A: camera stayed in Auto tour the whole run
+PASS A: E1 approach shows NACA and NASA live
+PASS A: E1 after contact NACA ended, NASA mass 2, lineage NACA>NASA
+PASS A: E2 before division shows one AEC, no successors
+PASS A: E2 division: AEC ended, ERDA+NRC started together
+PASS A: E2 aftermath frames both successors
+PASS A: E3 ERDA ends into DOE, DOE mass 2
+PASS A: final rail is ERDA transfer, 3 frames filed  approach:filed contact:filed post:filed
+PASS A: each event registered exactly once  [sys] National Advisory Committee for Aeronautics transfer registered · 1 Oct 1958 | [sys] Atomic Energy Commission division registered · 19 Jan 1975 | [sys] Energy Research and Development Administration transfer registered · 1 Oct 1977
+PASS A: dossier follows the director (NASA→AEC/ERDA→DOE)  NASA,NASA,NASA,AEC,ERDA,ERDA,ERDA,DOE,DOE
+PASS A: Replay offered at end
+PASS A: 9 evidence captures generated from the simulation
+A log: ["[sys] Feed acquired · census-v0.2-draft/slice-1","Tour · Reviewed slice 1958–1977","Play history","[sys] National Advisory Committee for Aeronautics transfer registered · 1 Oct 1958","[sys] Atomic Energy Commission division registered · 19 Jan 1975","[sys] Energy Research and Development Administration transfer registered · 1 Oct 1977","[sys] Tour complete · result held"]
+== Run B: pin NASA, ignore AEC notice, replay, Watch the split, evidence, scrub back
+PASS B1: clicking the NASA cell pins it  mode=follow pin=NASA
+PASS B1: AEC notice offered while pinned  Watch the Atomic Energy Commission split
+PASS B1: ignoring the notice, pin holds and NASA stays centered through the split and DOE  [[11.05,true,"Watch the Atomic Energy Commission split"],[11.95,true,"Watch the Atomic Energy Commission split"],[12.616,true,"Watch the Atomic Energy Commission split"],[13.533,true,"Watch the Atomic Energy Commission split"],[15.049,true,"Watch the Atomic Energy Commission split"],[18.533,true,"Watch the Energy Research and Development Administration join the Department of Energy"],[20.066,true,"Watch the Energy Research and Development Administration join the Department of Energy"]]
+PASS B1: camera never travelled to the AEC
+PASS B1: history still advanced while pinned (end state identical to Run A)
+PASS B2: Replay restarts from 1958 with NASA still pinned  T=0.2
+PASS B2: Watch releases the pin, replays the split from its lead-in, Auto tour resumes  T=9.65 mode=auto
+PASS B2: camera now frames both successors  {"x":2232,"y":654,"z":0.673}
+PASS B3: rail shows the AEC division with all three frames  before:filed division:filed successors:filed
+PASS B3: Division frame pauses and seeks to its phase  T=12.1
+PASS B3: at Division, later slot returns to pending  before:filed,division:filed,successors:pending
+PASS B3: at Division, AEC ended and both successors exist
+PASS B4: scrub to 1965 restores one AEC cell, NASA mass 2, only NACA>NASA edge  1965-05-31 alive=NASA,AEC edges=NACA>NASA
+PASS B4: rail at 1965 shows NACA transfer, 3 frames filed  approach:filed contact:filed post:filed
+PASS B4: scrub left playback paused (prior state)
+PASS B4: scrub to Sep 1958 restores NACA, NASA mass 1, no lineage edges  1958-09-14 alive=NACA,NASA,AEC
+PASS B4: Sep 1958 rail slots return to pending  approach:pending contact:pending post:pending
+PASS B4: NASA dossier reads pre-operational, transfer pending  STATUS Established by statute · operations begin 1 Oct 1958 DATES Act signed 29 Jul 1958 (72 Stat. 426). Operations from 1 Oct 1958. PARENT None (independent establishment) MASS 1 IN THIS DATASET CENSUS ID u-rg255 / Transfer pending at this date.
+PASS B4: scrub forward to 1976 gives NASA, ERDA, NRC; AEC gone; split edges back  alive=NASA,ERDA,NRC
+PASS B4: 1976 rail shows AEC division, 3 filed
+PASS B5: resumed tour ends in the same state as Run A
+PASS B5: DOE event registered once in the resumed run
+B log: ["[sys] Feed acquired · census-v0.2-draft/slice-1","Tour · Reviewed slice 1958–1977","Play history","[sys] National Advisory Committee for Aeronautics transfer registered · 1 Oct 1958","National Aeronautics and Space Administration pinned by viewer · clicked in arena","[sys] Event detected elsewhere · Atomic Energy Commission division","[sys] Atomic Energy Commission division registered · 19 Jan 1975","[sys] Event detected elsewhere · Energy Research and Development Administration transfer","[sys] Energy Research and Development Administration transfer registered · 1 Oct 1977","[sys] Tour complete · result held","Replay · still following National Aeronautics and Space Administration","[sys] National Advisory Committee for Aeronautics transfer registered · 1 Oct 1958","[sys] Event detected elsewhere · Atomic Energy Commission division","Watch Atomic Energy Commission division · pin on National Aeronautics and Space Administration released","[sys] Atomic Energy Commission division registered · 19 Jan 1975","Evidence frame opened · Atomic Energy Commission division / Division · paused","Scrubbed to 31 May 1965 · paused","Scrubbed to 14 Sep 1958 · paused","Scrubbed to 1 Mar 1976 · paused","Play history","[sys] Energy Research and Development Administration transfer registered · 1 Oct 1977","[sys] Tour complete · result held"]
+== Run C: pause before contact, change speed, cross contact, rewind, replay
+PASS C: paused before contact, contact slot pending  approach:pending,contact:pending,post:pending
+PASS C: at 2x through contact, all three E1 slots filed (event-local phases cannot be skipped)  approach:filed,contact:filed,post:filed
+PASS C: Previous rewinds to E1 lead-in, slots pending again  T=0.3 approach:pending,contact:pending,post:pending
+PASS C: magnified P-001 centre pixel matches the pellet colour in the arena render  #6cc36b vs 108,195,107
+PASS C: opening the exhibit keeps playhead and selection
+PASS C: zero pellet events in the dataset
+== Run D: full history, oldest to newest, and speeds
+PASS D: opens on the Full history tour at 1775 with Play history offered  Y=1774.5
+PASS D: speed menu offers -1x, 0.1x, 0.5x, 1x, 1.5x, 2x, 25x  -1,0.1,0.5,1,1.5,2,25
+PASS D: 1x plays about one year per second, hands-free in Auto tour  advanced 1.28 yr
+PASS D: 25x reaches 19 Nov 2026 and holds  2026-11-19 in 10.1 s
+PASS D: playback is chronological, oldest to newest (year never decreases at positive speed)
+PASS D: 2026 arena holds the agencies live in the draft census  alive=808
+PASS D: completion logged once
+PASS D: NACA becomes NASA on 1 Oct 1958
+PASS D: AEC divides into ERDA and NRC on 19 Jan 1975
+PASS D: ERDA goes into DOE on 1 Oct 1977
+PASS D: -1x plays backward (year decreases)  1978.41 -> 1977.66
+PASS D: paused in reverse, Play reads Play backward  Play backward
+PASS D: reverse playback crossed the AEC division backward: AEC back, ERDA and NRC gone  Y=1974.8638
+PASS D: state reached by reverse play equals state reached by seeking (agencies, positions, record, rail)  before:filed,event:pending,after:pending vs before:filed,event:pending,after:pending
+PASS D: 0.1x is comically slow (about a tenth of a year in a second)  advanced 0.101 yr in 2 s
+PASS D: timeline scrub lands on the year under the pointer  Y=1900.50
+PASS D: rail files frames from the simulation as beats pass  before:filed,event:pending,after:pending
+PASS D: clicking an evidence frame seeks to its moment and pauses  Y=1959.0288 ph=1959.0288
+PASS D: pinned to NASA, a beat elsewhere raises a Watch notice and the pin holds  Watch: Arlington Memorial Amphitheater Commission absorbed into Department of Defense
+PASS D: pinned NASA stays on screen  [650.545127864077,327.0705367537116]
+PASS D: Watch releases the pin and plays the beat in Auto tour
+PASS D: -1x also runs the reviewed slice backward  T=12.3
+PASS D: Escape closes the speed menu
+PASS no page errors
+
+0 failing checks
