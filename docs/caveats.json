@@ -1,0 +1,155 @@
+{
+ "dataset": {
+  "version": "v0.2-draft",
+  "graph_sha256_prefix": "c44c1d1eeda02845",
+  "source_nodes": 8447,
+  "source_edges": 739,
+  "included_units": 4005,
+  "included_edges": 579,
+  "marked_beats": 100,
+  "reviewed_beats": 3,
+  "reviewed_edges": 6,
+  "dropped": {
+   "name": 85,
+   "undated": 3896,
+   "excluded": 461,
+   "edge_unit": 160
+  }
+ },
+ "classification": {
+  "State, local, territorial or foreign": 10,
+  "Federal executive": 3223,
+  "Archival collection or record group": 6,
+  "Pre-federal predecessor": 7,
+  "Advisory or temporary body": 756,
+  "Legislative or judicial": 3
+ },
+ "confidence": {
+  "low": 2292,
+  "medium": 1701,
+  "high": 12
+ },
+ "start_basis": {
+  "records span": 685,
+  "agency history": 1258,
+  "law": 845,
+  "stated in source": 1210,
+  "reference year, not sourced": 7
+ },
+ "hard_errors": {},
+ "caveats": {
+  "duplicate_name_overlapping_life": 164,
+  "edge_before_donor_exists": 17,
+  "executive_dated_before_1789": 16,
+  "low_confidence": 2292,
+  "quarantined_archival_collection": 6,
+  "quarantined_non_federal_government": 10,
+  "reference_year_not_sourced": 7,
+  "rename_modeled_as_absorption": 1,
+  "start_is_records_span": 685,
+  "unreviewed_beat": 97,
+  "unreviewed_edge": 573
+ },
+ "examples": {
+  "duplicate_name_overlapping_life": [
+   "Lands Division",
+   "Office of the Register of the Treasury",
+   "Office of the Attorney General",
+   "Office of the Secretary",
+   "Office of the Secretary of the Treasury",
+   "Office of the First Auditor",
+   "Office of the First Comptroller",
+   "Lighthouse Service"
+  ],
+  "edge_before_donor_exists": [
+   161,
+   250,
+   252,
+   259,
+   260,
+   338,
+   339,
+   345
+  ],
+  "executive_dated_before_1789": [
+   "Lands Division",
+   "Statue of Liberty National Monument",
+   "Operating Divisions of the General Land Office",
+   "Customhouses",
+   "Subordinate Units to the Office of Territories",
+   "Postal Service",
+   "Accounting Officers of the Department of the Treasury",
+   "Adjutant and Inspector's Department"
+  ],
+  "low_confidence": [
+   "Government of the Danish West Indies",
+   "Lands Division",
+   "War Department Collection of Revolutionary War Records",
+   "Operating Divisions of the General Land Office",
+   "Customhouses",
+   "Continental and Confederation Congresses and the Constitutional Convention",
+   "Continental and Confederation Congresses (numbered Series)",
+   "Accounting Officers of the Department of the Treasury"
+  ],
+  "quarantined_archival_collection": [
+   "War Department Collection of Revolutionary War Records",
+   "Provost Marshal General's Bureau (Civil War) RG-110 Records",
+   "Domestic Records",
+   "Naval Records Collection of the Office of Naval Records and Library",
+   "War Department As Custodian of the Records",
+   "Foreign Military Studies (FMS) Program and Related Records"
+  ],
+  "quarantined_non_federal_government": [
+   "Government of the Danish West Indies",
+   "Government of the District of Columbia",
+   "Government of American Samoa",
+   "Territory of Hawaii",
+   "Canal Zone Government and the Panama Canal Company",
+   "Provisional Government of Cuba",
+   "Canal Zone Government",
+   "Military Government of Veracruz"
+  ],
+  "reference_year_not_sourced": [
+   "Department of Agriculture",
+   "Department of Defense",
+   "Department of the Air Force",
+   "Department of the Army",
+   "Dept. of Health and Human Services",
+   "Department of Veterans Affairs",
+   "Department of Homeland Security"
+  ],
+  "rename_modeled_as_absorption": [
+   142
+  ],
+  "start_is_records_span": [
+   "Government of the Danish West Indies",
+   "Lands Division",
+   "War Department Collection of Revolutionary War Records",
+   "Operating Divisions of the General Land Office",
+   "Customhouses",
+   "Continental and Confederation Congresses and the Constitutional Convention",
+   "Continental and Confederation Congresses (numbered Series)",
+   "Accounting Officers of the Department of the Treasury"
+  ],
+  "unreviewed_beat": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "unreviewed_edge": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   8
+  ]
+ }
+}

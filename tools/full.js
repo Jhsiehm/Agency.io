@@ -4,7 +4,7 @@
 const HDATASET = "census-" + HIST.meta.version + "/full";
 const yToMs = y => { const Y = Math.floor(y), a = Date.UTC(Y, 0, 1), b = Date.UTC(Y + 1, 0, 1); return a + (y - Y) * (b - a); };
 const msToY = ms => { const Y = new Date(ms).getUTCFullYear(), a = Date.UTC(Y, 0, 1), b = Date.UTC(Y + 1, 0, 1); return Y + (ms - a) / (b - a); };
-const FY0 = 1774.5, FY1 = msToY(D("2026-11-19") + DAY / 2);
+const FY0 = 1775, FY1 = msToY(D("2026-11-19") + DAY / 2);
 const HWORLD = { w: HIST.meta.world[0], h: HIST.meta.world[1] };
 const TIER_BASE = { 1: 2.0, 2: 1.35, 3: 1.0, 4: 0.78, 5: 0.62, 6: 0.68 };
 const LEVEL_NAME = { 1: "Department", 2: "Independent agency", 3: "Bureau", 4: "Sub-agency or office", 5: "Field or regional unit", 6: "Temporary or advisory body" };
@@ -12,14 +12,17 @@ const BASIS_NAME = ["law", "stated in source", "agency history", "records span",
 const CONF_NAME = ["high", "medium", "low"];
 const KIND_NAME = ["absorbed", "merged", "moved", "partial transfer", "renamed", "succeeded"];
 const KIND_EXPL = ["abolished; functions went to the target", "combined into the target", "unit survives, new parent", "some functions moved to the target", "same entity, new name", "replaced by the target"];
+const CLASS_NAME = ["Federal executive", "Legislative or judicial", "Pre-federal predecessor", "State, local, territorial or foreign", "Archival collection or record group", "Advisory or temporary body"];
+const MASS_EXPL = "Relative visual size is an artistic function of dataset classification and included relationships. It does not represent staff, budget, jurisdiction, legal authority, or public impact.";
 const END_NAME = ["No end recorded", "Ended", "Absorbed", "Continued under a new name", "Divided", "Retired by the feed"];
 function hsl(h, s, l) { s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return "#" + [f(0), f(8), f(4)].map(v => Math.round(v * 255).toString(16).padStart(2, "0")).join(""); }
 const GLYPH_RULES = [[/aeronaut|space/i, "planet"], [/aviation|air (force|corps|commerce|mail)|aircraft|airport/i, "wing"], [/atomic|nuclear/i, "atom"], [/energy|power|electric/i, "bolt"], [/defense|security|regulat|intelligence|protect/i, "shield"], [/navy|naval|maritime|coast|ship|harbor|steamboat/i, "anchor"], [/army|war\b|military|veteran|marine corps/i, "star"], [/agricult|farm|food|grain|crop|forest/i, "wheat"], [/interior|land|park|geolog|mine|reclamation|mountain/i, "mountain"], [/census|statistic|budget|treasury|revenue|mint|accounts/i, "tally"], [/broadcast|radio|communicat|telegraph|signal|postal|post office/i, "mast"], [/labor|works|engineer|construction|housing|road|highway/i, "hardhat"], [/department|court|justice|state\b|commission/i, "portico"]];
-const HU = HIST.U.map((a, i) => ({ i, key: "h" + i, name: a[0], tier: a[1], level: a[2], t0: a[3], t1: a[4], endKind: a[5], conf: a[6], basis: a[7], url: a[8], id: a[9], homes: a[10], m: a[11], bornOf: a[12], into: a[13], sY: a[14], eY: a[15], loc: a[16], seed: (i * 2654435761 % 1000) / 160, ins: [], outs: [] }));
+const HU = HIST.U.map((a, i) => ({ i, key: "h" + i, name: a[0], tier: a[1], level: a[2], t0: a[3], t1: a[4], endKind: a[5], conf: a[6], basis: a[7], url: a[8], id: a[9], homes: a[10], m: a[11], bornOf: a[12], into: a[13], sY: a[14], eY: a[15], loc: a[16], cls: a[17] || 0, flags: a[18] || 0, q: a[17] === 3 || a[17] === 4, seed: (i * 2654435761 % 1000) / 160, ins: [], outs: [] }));
 const HE = HIST.E.map((a, i) => ({ i, from: a[0], to: a[1], kind: a[2], t: a[3], date: a[4], stat: a[5], auth: a[6], conf: a[7], ev: a[8], sent: a[9], note: a[10], reviewed: !!a[11] }));
 const HB = HIST.B.map((a, i) => ({ i, t: a[0], kind: a[1], title: a[2], units: a[3], edges: a[4], reviewed: !!a[5] }));
 const HBYID = new Map(HU.map(u => [u.id, u]));
 HE.forEach(e => { HU[e.from].outs.push(e); HU[e.to].ins.push(e); });
+HE.forEach(e => { if (e.reviewed) { HU[e.from].reviewed = true; HU[e.to].reviewed = true; } });
 const HE_T = HE.filter(e => e.t !== null).sort((a, b) => a.t - b.t);
 /* family colours: each root (department or parentless agency) gets a hue; its sub-units share it */
 (() => {
@@ -73,7 +76,7 @@ function hCell(u, y) {
 }
 /* absorbed agencies travel to their recipient; longer trips take longer (0.7 to 1.8 years), still a pure function of the date */
 function hTravel(u) { if (u._w === undefined) { const a = hHomeAt(u, u.t1 - 1e-4), b = hHomeAt(HU[u.into[0]], u.t1); u._w = Math.max(0.7, Math.min(1.8, Math.hypot(a[0] - b[0], a[1] - b[1]) / 2500)); } return u._w; }
-function hCells(y) { const out = []; for (const u of HU) { if (u.t0 > y) break; const c = hCell(u, y); if (c) out.push(c); } return out; }
+function hCells(y) { const out = []; for (const u of HU) { if (u.t0 > y) break; if (u.q && !S.showQ) continue; const c = hCell(u, y); if (c) out.push(c); } return out; }
 function hPosAny(u, y) {
   if (y < u.t0) return [u.homes[0][1], u.homes[0][2], hRadius(u, u.t0 + 0.01)];
   if (u.t1 !== null && y >= u.t1) {
@@ -157,12 +160,22 @@ function renderFull(ctx, W, H, cam, y, cells, opt = {}) {
   }
   ctx.setLineDash([]); ctx.globalAlpha = 1;
   const vis = cells.filter(c => !(c.x + c.r < vx0 || c.x - c.r > vx1 || c.y + c.r < vy0 || c.y - c.r > vy1)).sort((a, b) => a.r - b.r);
+  /* LOD 0/1: institution families. Grouped by recorded parentage at this date (never by proximity); a visual grouping, not a merger. */
+  const famA = opt.families === false || !S.layers.families ? 0 : clamp01((0.16 - cam.z) / 0.06);
+  const fams = famA > 0.01 ? hFamilies(vis, y) : [];
+  for (const f of fams) {
+    ctx.globalAlpha = 0.13 * famA; ctx.fillStyle = f.root.color; ctx.beginPath(); ctx.arc(f.cx, f.cy, f.R, 0, 7); ctx.fill();
+    ctx.globalAlpha = 0.55 * famA; ctx.strokeStyle = shade(f.root.color, -0.3); ctx.lineWidth = 1.4 / cam.z; ctx.setLineDash([6 / cam.z, 5 / cam.z]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.globalAlpha = 1;
+  const unc = S.layers.uncertain;
   for (const c of vis) {
     const sr = c.r * cam.z; ctx.globalAlpha = c.a;
     if (sr < 7) { ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, 7); ctx.fillStyle = c.color; ctx.fill(); continue; }
     if (sr < 26) { ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, 7); ctx.fillStyle = c.color; ctx.fill(); ctx.lineWidth = Math.max(1.5, c.r * 0.07); ctx.strokeStyle = shade(c.color, -0.16); if (c.u.endKind === 5) ctx.setLineDash([c.r * 0.2, c.r * 0.14]); ctx.stroke(); ctx.setLineDash([]); }
     else drawCellBody(ctx, c.x, c.y, c.r, c.color, y * 3, c.u.seed * 3, { preop: c.u.endKind === 5 });
     ctx.globalAlpha = 1;
+    if (unc && (c.u.flags & 3 || c.u.conf === 2) && sr >= 3) { ctx.save(); ctx.globalAlpha = c.a * (c.u.flags & 3 ? 0.9 : 0.45); ctx.strokeStyle = c.u.flags & 3 ? "#8a5a12" : "#6f7d78"; ctx.lineWidth = Math.max(1.6 / cam.z, c.r * 0.06); ctx.setLineDash(c.u.flags & 3 ? [c.r * 0.18, c.r * 0.12] : [c.r * 0.05, c.r * 0.12]); ctx.beginPath(); ctx.arc(c.x, c.y, c.r + Math.max(3 / cam.z, c.r * 0.12), 0, 7); ctx.stroke(); ctx.restore(); }
     drawLabel(ctx, c.x, c.y, Math.round(c.r / 3) * 3, c.u.name, c.u.tier <= 3 ? c.u.glyph : null, c.color, c.a, cam.z);
   }
   if (opt.pin) {
@@ -171,6 +184,51 @@ function renderFull(ctx, W, H, cam, y, cells, opt = {}) {
       for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { ctx.moveTo(c.x + sx * s, c.y + sy * (s - L)); ctx.lineTo(c.x + sx * s, c.y + sy * s); ctx.lineTo(c.x + sx * (s - L), c.y + sy * s); } ctx.stroke(); }
   }
   ctx.restore();
+  if (opt.labels !== false) hScreenLabels(ctx, W, H, cam, vis, fams, famA, opt);
+}
+/* families: root of the recorded parent chain at date y; only groups of 4+ visible members are drawn */
+function hRootAt(u, y) { let c = u, n = 0, p; while (n++ < 10 && (p = hParentAt(c, y))) c = p; return c; }
+function hFamilies(vis, y) {
+  const groups = new Map();
+  for (const c of vis) { const r = hRootAt(c.u, y); let g = groups.get(r.i); if (!g) groups.set(r.i, g = { root: r, cs: [] }); g.cs.push(c); }
+  const out = [];
+  for (const g of groups.values()) {
+    if (g.cs.length < 4) continue;
+    let sw = 0, sx = 0, sy = 0; for (const c of g.cs) { const w = c.r * c.r; sw += w; sx += c.x * w; sy += c.y * w; }
+    const cx = sx / sw, cy = sy / sw, ds = g.cs.map(c => Math.hypot(c.x - cx, c.y - cy) + c.r).sort((a, b) => a - b);
+    out.push({ root: g.root, cx, cy, R: ds[Math.floor((ds.length - 1) * 0.85)] * 1.06, n: g.cs.length });
+  }
+  return out.sort((a, b) => b.n - a.n);
+}
+/* screen-space labels with collision avoidance: family badges first (largest first), then small departments and independent agencies */
+const shortName = n => n.replace(/^(United States|U\.S\.) /, "").replace(/^Department of (the )?/, "Dept. of ").replace(/ Administration$/, " Admin.");
+function hScreenLabels(ctx, W, H, cam, vis, fams, famA, opt) {
+  const placed = [], fits = (x, y, w, h) => { if (x < 4 || y < 4 || x + w > W - 4 || y + h > H - 4) return false; for (const p of placed) if (x < p[0] + p[2] && x + w > p[0] && y < p[1] + p[3] && y + h > p[1]) return false; placed.push([x, y, w, h]); return true; };
+  const sx = x => W / 2 + (x - cam.x) * cam.z, sy = y => H / 2 + (y - cam.y) * cam.z;
+  ctx.save(); ctx.textBaseline = "middle"; let n = 0;
+  const famRoots = new Set();
+  if (famA > 0.01) for (const f of fams) {
+    const name = shortName(f.root.name), cnt = "+" + (f.n - 1) + " institution" + (f.n > 2 ? "s" : "");
+    ctx.font = '600 11px "IBM Plex Sans", sans-serif'; const w1 = ctx.measureText(name).width; ctx.font = '500 9.5px "IBM Plex Mono", monospace'; const w2 = ctx.measureText(cnt).width;
+    const w = Math.max(w1, w2) + 14, h = 32, x = sx(f.cx) - w / 2, y = sy(f.cy - f.R) - h - 2;
+    if (!fits(x, y, w, h) && !fits(x, sy(f.cy) - h / 2, w, h)) continue;
+    const [bx, by] = placed[placed.length - 1];
+    ctx.globalAlpha = famA; ctx.fillStyle = "rgba(17,26,23,.86)"; ctx.fillRect(bx, by, w, h); ctx.fillStyle = f.root.color; ctx.fillRect(bx, by, 3, h);
+    ctx.fillStyle = "#eef3f0"; ctx.font = '600 11px "IBM Plex Sans", sans-serif'; ctx.fillText(name, bx + 9, by + 11);
+    ctx.fillStyle = "#f2b45a"; ctx.font = '500 9.5px "IBM Plex Mono", monospace'; ctx.fillText(cnt, bx + 9, by + 23);
+    famRoots.add(f.root.i); if (++n > 28) break;
+  }
+  ctx.globalAlpha = 1; ctx.font = '600 10.5px "IBM Plex Sans", sans-serif';
+  const small = vis.filter(c => c.u.tier <= 2 && c.a > 0.5 && !famRoots.has(c.u.i) && c.r * cam.z >= 2.5 && c.r * cam.z < 9).sort((a, b) => b.r - a.r || a.u.tier - b.u.tier);
+  let m = 0;
+  for (const c of small) {
+    const t = shortName(c.u.name), w = ctx.measureText(t).width + 8, h = 15, x = sx(c.x) + c.r * cam.z + 3, y = sy(c.y) - h / 2;
+    if (!fits(x, y, w, h)) continue;
+    ctx.fillStyle = "rgba(248,246,239,.88)"; ctx.fillRect(x, y, w, h); ctx.fillStyle = "#1d2321"; ctx.fillText(t, x + 4, y + h / 2 + 0.5);
+    if (++m >= 36) break;
+  }
+  ctx.restore();
+  if (opt.stats) { opt.stats.families = famRoots.size; opt.stats.smallLabels = m; }
 }
 
 /* ---------- viewer actions ---------- */
@@ -257,6 +315,7 @@ function hStatus(u, y) {
   if (u.t1 !== null && y >= u.t1) return { s: END_NAME[u.endKind] + " · " + (u.endKind >= 2 && u.endKind <= 4 ? fmtY(u.t1) : Math.floor(u.t1)), tag: "off" };
   return { s: u.endKind === 5 ? "Operating · end not recorded" : "Operating", tag: "on" };
 }
+const hStartText = u => u.flags & 1 ? `records coverage begins ${u.sY}` : u.basis === 4 ? `${u.sY} (reference year, not sourced)` : u.basis === 5 ? `${u.sY} (basis not recorded)` : `sometime in ${u.sY}`;
 const hDates = u => `${u.sY}${u.basis === 4 ? " (reference year, not sourced)" : ""} – ${u.t1 === null ? (u.endKind === 0 ? "present or not recorded" : "") : u.endKind === 5 ? "not recorded" : (u.endKind >= 2 && u.endKind <= 4 ? fmtY(u.t1) : Math.floor(u.t1))}`;
 let hDosSig = "";
 function renderDossierFull() {
@@ -269,8 +328,8 @@ function renderDossierFull() {
   $("dShort").textContent = u.name; $("dLong").textContent = "Census ID " + u.id + " · draft v0.2";
   const g = embCanvas.getContext("2d"); g.clearRect(0, 0, 112, 112); g.beginPath(); g.arc(56, 56, 50, 0, 7); g.fillStyle = u.color; g.fill();
   if (u.glyph) { g.save(); g.translate(56, 56); glyph(g, u.glyph, 58, shade(u.color, -0.55)); g.restore(); }
-  $("dKv").innerHTML = `<dt>Status</dt><dd><span class="tag ${st.tag}">${st.s}</span></dd><dt>Dates</dt><dd>${hDates(u)}</dd><dt>Level</dt><dd>${LEVEL_NAME[u.level] || "Unit"}</dd><dt>Parent</dt><dd>${par ? par.name : "None recorded at this date"}</dd><dt>Mass</dt><dd>${m} <span class="lbl">in this dataset</span></dd><dt>Confidence</dt><dd>${CONF_NAME[u.conf]} · start basis: ${BASIS_NAME[u.basis]}</dd><dt>Census ID</dt><dd class="mono">${u.id}</dd>`;
-  $("dExpl").textContent = u.ins.length + u.outs.length ? `${u.ins.length + u.outs.length} dated relationship${u.ins.length + u.outs.length > 1 ? "s" : ""} in the draft census.` : "No dated relationships in the draft census.";
+  $("dKv").innerHTML = `<dt>Status</dt><dd><span class="tag ${st.tag}">${st.s}</span></dd><dt>Dates</dt><dd>${hDates(u)}</dd><dt>Level</dt><dd>${LEVEL_NAME[u.level] || "Unit"}</dd><dt>Parent</dt><dd>${par ? par.name : "None recorded at this date"}</dd><dt>Start</dt><dd>${hStartText(u)}${u.flags & 1 ? ' <span class="tag warn">not a founding date</span>' : ""}</dd><dt>Class</dt><dd>${CLASS_NAME[u.cls]} <span class="lbl">inferred from name</span>${u.q ? ' <span class="tag warn">quarantined</span>' : ""}</dd><dt>Review</dt><dd>${u.reviewed ? '<span class="rv ok">Reviewed record</span>' : '<span class="rv draft">Draft · unreviewed</span>'}</dd><dt>Visual mass</dt><dd>${m} <span class="lbl" title="${MASS_EXPL}">model units ⓘ</span></dd><dt>Confidence</dt><dd>${CONF_NAME[u.conf]} · start basis: ${BASIS_NAME[u.basis]}</dd><dt>Census ID</dt><dd class="mono">${u.id}</dd>`;
+  $("dExpl").textContent = (u.ins.length + u.outs.length ? `${u.ins.length + u.outs.length} dated relationship${u.ins.length + u.outs.length > 1 ? "s" : ""} in the draft census.` : "No dated relationships in the draft census.") + " Cell size is a visual model, not budget or staff.";
   let b = "";
   if (S.pin === k) b += `<button class="btn amber" type="button" data-act="unpin">${ic("close")}Stop following</button>`;
   else if (hAlive(u, y)) b += `<button class="btn amber" type="button" data-act="follow" data-k="${k}">${ic("lock")}Follow</button>`;
@@ -404,6 +463,8 @@ function renderMiniFull(cells) {
   mctx.strokeStyle = "#1c2924"; mctx.lineWidth = 1; mctx.strokeRect(ox, oy, HWORLD.w * s, HWORLD.h * s);
   for (const c of cells) { mctx.globalAlpha = c.a; mctx.fillStyle = c.color; const rr = Math.max(1.2, c.r * s); mctx.fillRect(ox + c.x * s - rr, oy + c.y * s - rr, rr * 2, rr * 2); }
   mctx.globalAlpha = 1;
+  { const b = HB[hBeatIdx(S.Y + 0.6)]; if (b && Math.abs(S.Y - b.t) < 0.8) { const u = 1 - Math.abs(S.Y - b.t) / 0.8; mctx.strokeStyle = b.reviewed ? "#5fd4c6" : "#f2b45a"; mctx.lineWidth = 1.5; mctx.globalAlpha = u;
+    for (const i of hBeatUnits(b)) { const [x, y] = hPosAny(HU[i], S.Y); mctx.beginPath(); mctx.arc(ox + x * s, oy + y * s, 4 + 10 * (1 - u), 0, 7); mctx.stroke(); } mctx.globalAlpha = 1; } }
   const vw = AW / cam.z, vh = AH / cam.z;
   mctx.strokeStyle = "#f2b45a"; mctx.lineWidth = 2; mctx.strokeRect(ox + (cam.x - vw / 2) * s, oy + (cam.y - vh / 2) * s, vw * s, vh * s);
 }

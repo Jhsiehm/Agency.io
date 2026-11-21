@@ -338,6 +338,30 @@ for u in U.values():
 for e in E:
     if e["t"] is not None and Y0 <= int(e["t"]) <= Y1: hist[int(e["t"])][2] += 1
 
+
+# ---------------- entity classification (rule-based, inferred from the name; see docs/data-caveats.md) ----------------
+# 0 federal executive, 1 legislative/judicial, 2 pre-federal predecessor, 3 state/local/territorial/foreign,
+# 4 archival collection / record group, 5 advisory or temporary body. Nothing is deleted: classes 3 and 4 are quarantined in the UI.
+CLS_LEG = re.compile(r"^(United States |U\.S\. )?(Senate|House of Representatives|Congress\b|Supreme Court|Court of (Claims|Appeals|Customs)|Tax Court)|District Courts?\b|Library of Congress|Government Printing Office|General Accounting Office|Government Accountability Office|Architect of the Capitol|Botanic Garden|Capitol Police|Congressional Budget Office|Office of Technology Assessment")
+CLS_NOT_LEG = re.compile(r"^(U\.S\. Attorneys|U\.S\. Marshals|Office of Solicitor|Solicitor)|\(Justice\)|Section")
+CLS_TERR = re.compile(r"^Government of (the )?(?!United States)|^Territory of|^Provisional Government|^Military Government of|Canal Zone Government|Danish West Indies")
+CLS_ARCH = re.compile(r"Collection of .*Records|Records Collection|RG-\d+ Records|Custodian of the Records|and Related Records|^Domestic Records$")
+CLS_PRE = re.compile(r"Continental|Confederation|Constitutional Convention")
+def classify(u):
+    n = u["name"]
+    if CLS_ARCH.search(n): return 4
+    if CLS_TERR.search(n): return 3
+    if CLS_PRE.search(n) and u["sY"] < 1789: return 2
+    if CLS_LEG.search(n) and not CLS_NOT_LEG.search(n): return 1
+    if u["level"] == 6: return 5
+    return 0
+def flags(u):
+    f = 0
+    if u["basis"] == "records" and not u["ref"]: f |= 1          # start year is the start of a records span, not a founding date
+    if u["ref"]: f |= 2                                          # reference year, not sourced
+    if u["sY"] < 1789 and classify(u) == 0: f |= 4               # executive-classed unit dated before the federal government existed
+    return f
+
 # ---------------- emit ----------------
 order = sorted(U.values(), key=lambda u: (u["t0"], u["tier"], u["name"]))
 idx = {u["id"]: i for i, u in enumerate(order)}
@@ -355,7 +379,7 @@ for u in order:
     for t, m in steps[u["id"]]: flat_m += [r4(t), m]
     homes = [[h[0], h[1] - round(ox), h[2] - round(oy), idx[h[3]] if h[3] else -1] for h in u["homes"]]
     units_out.append([u["name"], u["tier"], u["level"], r4(u["t0"]), r4(u["t1"]), u["endKind"], CONF[u["conf"]], BASIS[u["basis"] if not u["ref"] else "reference"],
-                      url_i(u["url"]), u["id"], homes, flat_m, (-1 if u.get("formed") else idx.get(u.get("born_of"), -1)), [idx[x] for x in u.get("into", [])], u["sY"], u["eY"], u["loc"]])
+                      url_i(u["url"]), u["id"], homes, flat_m, (-1 if u.get("formed") else idx.get(u.get("born_of"), -1)), [idx[x] for x in u.get("into", [])], u["sY"], u["eY"], u["loc"], classify(u), flags(u)])
 edges_out = []
 for e in E:
     edges_out.append([idx[e["f"]], idx[e["to"]], KIND[e["kind"]], r4(e["t"]), e["date"], e["stat"], e["auth"], CONF.get(e["conf"], 2), e["ev"], e["sent"], e["note"], 1 if e["reviewed"] else 0])

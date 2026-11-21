@@ -1,8 +1,9 @@
 # Handoff notes for the next engineer
 
-- `index.html` is generated. Edit `tools/src.html` (desk, reviewed slice) and `tools/full.js` (full-history engine), then run `sh tools/build.sh` from `tools/` and copy `tools/index.html` to the root.
-- `tools/hist.js` is compiled data: `python3 -I tools/compile_history.py <dataset_dir> tools/hist.js`. The dataset (census v0.2-draft, `core/graph.json` sha256 c44c1d1e…) is not in this repo.
-- Data overrides (operations dates for NASA 1 Oct 1958, ERDA/NRC 19 Jan 1975, DOE 1 Oct 1977) live in `compile_history.py` (`OPS`, `DOE_OPS`). Fix data there, not in the HTML.
-- History is a pure function of the date (`hCells(y)`, `hAuto(y)`); reverse play and seeking must stay equivalent. `window.FC` and `FC.full` are the test hooks.
-- Tests: `node tests/acceptance.test.js` (Playwright; 64 checks, last run all passing).
-- Known draft-data gaps: War Department and National Military Establishment have no end date; 3,896 undated units are excluded; level-6 bodies with no end are retired after 4 years as a display rule.
+- `index.html` is generated. Sources live in `tools/`: `src.html` (desk, reviewed slice, modes, cold open, layers), `full.js` (full-history engine, LOD clusters, screen-space labels), `sim.js` (Simulate), `report.js` (Report cards). Run `sh tools/build.sh` and copy `tools/index.html` to the root.
+- `tools/hist.js` is compiled data: `python3 -I tools/compile_history.py <dataset_dir> tools/hist.js`. The dataset (census v0.2-draft, `core/graph.json` sha256 c44c1d1e…) is not in this repo. Units now carry two extra fields: entity class (index 17) and caveat flags (index 18); see `classify()` / `flags()` in the compiler.
+- Data overrides (operations dates for NASA 1 Oct 1958, ERDA/NRC 19 Jan 1975, DOE 1 Oct 1977) live in `compile_history.py` (`OPS`, `DOE_OPS`). Fix data there, not in the HTML. Then run `tools/validate_census.py` to regenerate `docs/data-caveats.md` and `docs/caveats.json`.
+- Invariants: history is a pure function of the date (`hCells(y)`, `hAuto(y)`); reverse play and seeking must stay equivalent. Layers and modes are presentation only. Simulate has its own clock (`SIM_DT`), seed and state (`SIMV`), never reads or writes archive state, and replays exactly from `(seed, version, scenario, archetype, log)` (`simReplay`). No trig in the sim step, so results do not depend on the engine's Math.sin.
+- Test hooks: `window.FC` (slice), `FC.full` (full history, `stats()` for LOD), `FC.sim` (`run`, `live`, `start`), `FC.report` (`model`, `set`), `FC.cold()`, `FC.review()`, `FC.setLayer()`, `FC.setApp()`.
+- Known draft-data gaps: War Department and National Military Establishment have no end date; 3,896 undated units are excluded; level-6 bodies with no end are retired after 4 years as a display rule; 685 starts are records spans (shown as "records coverage begins"); entity classes are inferred from names by rule, not reviewed.
+- See `docs/decisions.md` for what was deliberately not done yet.

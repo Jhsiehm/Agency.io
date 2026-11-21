@@ -222,6 +222,92 @@ footer .r{margin-left:auto;color:var(--cyan)}
   #tour{width:100%}
   #tour button{flex:1;justify-content:center}
 }
+
+/* ---- modes: Observe | Simulate | Report ---- */
+#modes button{font:500 11.5px var(--f-mono);letter-spacing:.06em;padding:5px 12px;color:var(--ink-2);display:inline-flex;gap:7px;align-items:center;text-transform:uppercase}
+#modes button[aria-pressed="true"]{color:var(--amber);background:#1a1710}
+#modes button:hover{color:var(--ink)}
+body:not([data-app="simulate"]) .sim-only{display:none!important}
+body:not([data-app="report"]) .rep-only{display:none!important}
+body[data-app="simulate"] .obs-only,body[data-app="report"] .obs-only{display:none!important}
+.rv{font:500 10px var(--f-mono);letter-spacing:.06em;padding:1px 6px;border:1px solid var(--line-2);white-space:nowrap;text-transform:uppercase;display:inline-block}
+.rv.ok{border-color:var(--cyan);color:var(--cyan)} .rv.draft{border-style:dashed;color:var(--amber);border-color:#6b5228} .rv.fic{border-color:var(--split);color:var(--split)}
+.tag.warn{border-style:dashed;border-color:#6b5228;color:var(--amber)}
+.desk{display:flex;gap:12px;align-items:baseline;min-height:18px}
+.desk i{font:italic 400 13px var(--f-ui);color:var(--ink-2)}
+#layersBtn{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid var(--line-2);background:#0e1513;font:500 11.5px var(--f-mono);color:var(--ink-2)}
+#layersBtn[aria-expanded="true"]{border-color:var(--cyan)}
+#layersMenu{position:fixed;z-index:30;background:#0f1715;border:1px solid var(--cyan);padding:4px;display:flex;flex-direction:column;min-width:270px;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+#layersMenu .hd{font:500 10px var(--f-mono);letter-spacing:.08em;color:var(--dim);padding:5px 10px 3px}
+#layersMenu button{display:grid;grid-template-columns:16px 1fr;gap:4px 10px;text-align:left;padding:7px 10px;font:500 12px var(--f-mono);color:var(--ink-2)}
+#layersMenu button .d{grid-column:2;font:400 11px var(--f-ui);color:var(--dim)}
+#layersMenu button .bx{width:12px;height:12px;border:1px solid var(--line-2);margin-top:2px}
+#layersMenu button[aria-checked="true"]{color:var(--cyan)} #layersMenu button[aria-checked="true"] .bx{background:var(--cyan);border-color:var(--cyan)}
+#layersMenu button:hover{background:#141e1b}
+/* cold open */
+#coldTop{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#0f1a17;border:1px solid #213a34;color:var(--cyan);font:500 11px var(--f-mono);letter-spacing:.08em;padding:5px 12px;white-space:nowrap;pointer-events:none;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis}
+#coldTop.hot{color:var(--amber);border-color:var(--amber)}
+#coldSkip{position:absolute;right:10px;bottom:12px}
+#cold{position:absolute;left:14px;bottom:14px;background:#101a17;border:1px solid var(--amber);padding:14px 16px;display:flex;flex-direction:column;gap:9px;width:min(430px,calc(100% - 28px));box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#cold .t{font:600 15px var(--f-ui)}
+#cold .expl{font-size:11.5px;color:var(--dim)}
+#cold .deskl{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:2px}
+#cold .deskl i{font:italic 400 14px var(--f-ui);color:var(--ink)}
+#cold .tip{font:400 11.5px var(--f-mono);color:var(--dim)}
+/* simulate */
+#simBanner{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#1b1220;border:1px solid var(--split);color:var(--split);font:500 11px var(--f-mono);letter-spacing:.08em;padding:5px 12px;white-space:nowrap;pointer-events:none;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;z-index:2}
+#simSetup,#simOver{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#101a17;border:1px solid var(--amber);padding:16px 18px;display:flex;flex-direction:column;gap:10px;width:min(640px,calc(100% - 24px));max-height:calc(100% - 60px);overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#simOver{top:auto;bottom:18px;transform:translateX(-50%)}
+#simSetup .t,#simOver .t{font:600 16px var(--f-ui)}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.pick button{display:flex;flex-direction:column;gap:3px;text-align:left;border:1px solid var(--line-2);padding:8px 10px;background:#0e1513}
+.pick button b{font:600 12.5px var(--f-ui);color:var(--ink)} .pick button span{font:400 11.5px var(--f-ui);color:var(--dim)}
+.pick button[aria-pressed="true"]{border-color:var(--amber);background:#1a1710} .pick button[aria-pressed="true"] b{color:var(--amber)}
+#simSetup input{background:#0b110f;border:1px solid var(--line-2);color:var(--ink);font:13px var(--f-mono);padding:6px 9px}
+#simBar,#repBar{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 10px;margin:0 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+#simAbil{display:flex;gap:6px;flex-wrap:wrap}
+#simAbil button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:1px solid var(--line-2);padding:5px 10px;min-height:44px;min-width:120px;text-align:left;background:#0e1513}
+#simAbil button b{font:600 12px var(--f-ui);color:var(--ink-2)} #simAbil button .k{font:500 10px var(--f-mono);color:var(--dim)}
+#simAbil button .cd{font:500 10px var(--f-mono);color:var(--dim)}
+#simAbil button.ready{border-color:var(--amber)} #simAbil button.ready b{color:var(--amber)} #simAbil button.ready .cd{color:var(--cyan)}
+#simSess{display:flex;flex-direction:column;gap:6px;padding:10px 20px;margin:0 10px}
+#simTl{position:relative;height:14px;border:1px solid var(--line-2);background:#0e1513;--p:0}
+#simTl .wv{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--danger);opacity:.7}
+#simTl .ph{position:absolute;left:0;top:0;bottom:0;width:calc(var(--p) * 100%);background:linear-gradient(90deg,#1d3a34,#2d5a50);pointer-events:none}
+.bar{display:block;height:6px;border:1px solid var(--line-2);background:#0e1513;margin:4px 0}
+.bar i{display:block;height:100%;background:var(--amber)}
+#simRes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:12px}
+#simRes li{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center;color:var(--ink-2)}
+#simRes b{font:500 12px var(--f-mono);color:var(--ink)}
+.pd{display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;font:700 8px var(--f-cell);color:#1d2321;margin-right:6px;vertical-align:-2px}
+#simRes .pd{margin:0}
+#simAlerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ink-2)}
+#simAlerts li .ts{font:400 10.5px var(--f-mono);color:var(--dim);margin-right:6px}
+#simAlerts li.sys{color:var(--dim)}
+#simRivals{width:100%;border-collapse:collapse;font-size:12px}
+#simRivals td{padding:4px 4px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+/* report */
+#repStage{position:absolute;inset:0;background:#0a0f0d;display:grid;place-items:center;padding:12px}
+#repCanvas{display:block;box-shadow:0 8px 30px rgba(0,0,0,.5);border:1px solid var(--line-2)}
+#repBar select{background:#0b110f;border:1px solid var(--line-2);color:var(--ink);font:12px var(--f-mono);padding:6px 8px;max-width:260px}
+#repBar .seg button,#repDesk{font:500 11.5px var(--f-mono);padding:6px 10px;color:var(--ink-2);min-height:32px}
+#repBar .seg button[aria-pressed="true"],#repDesk[aria-pressed="true"]{color:var(--amber);background:#1a1710}
+#repBar .seg button:disabled{opacity:.35}
+#repDesk{border:1px solid var(--line-2)}
+.rep-item{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;border:1px solid var(--line-2);padding:8px 10px;font:500 12.5px var(--f-ui);color:var(--ink-2);background:#0e1513}
+.rep-item[aria-pressed="true"]{border-color:var(--amber);color:var(--ink)}
+#repList{display:flex;flex-direction:column;gap:6px}
+@media (max-width:820px){
+  #modes button{padding:5px 8px;font-size:10.5px;min-height:34px} #modes button .ic{display:none}
+  #repBar button,#repBar select{min-height:36px}
+  header .deskid{display:none}
+  header{gap:8px;padding:0 8px} .brand .logo{height:16px!important}
+  header .btn.mobile-only{font-size:0;gap:0;padding:7px 9px} header .btn.mobile-only .ic{width:15px;height:15px}
+  #simBanner .long{display:none}
+  #simBar,#repBar{margin:0 6px;gap:8px} #simAbil button{min-width:0;flex:1}
+  #simSess{padding:6px 10px}
+  #cold{bottom:10px;padding:12px}
+}
 @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
 </style>
 
@@ -231,20 +317,32 @@ footer .r{margin-left:auto;color:var(--cyan)}
     <div class="brand">
       <img class="logo" src="data:image/png;base64,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" width="160" height="32" alt="Statecraft"><span class="sep"></span><span class="prod">Agency.io</span>
     </div>
-    <div class="mid"><span class="lbl">Observation desk</span><span class="lbl c"><svg class="ic" aria-hidden="true"><use href="#i-signal"/></svg> Archive connected · <span id="dsv"></span></span></div>
-    <button class="btn mobile-only sheet-rail" id="openRail" type="button"><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg>Contact sheet</button>
-    <button class="btn mobile-only" id="openDos" type="button"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg>Dossier</button>
-    <span class="lbl a" style="margin-left:auto"><svg class="ic" aria-hidden="true"><use href="#i-monitor"/></svg> Desk 01</span>
+    <div class="seg" id="modes" role="group" aria-label="Mode"><button type="button" data-app="observe" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg>Observe</button><button type="button" data-app="simulate" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>Simulate</button><button type="button" data-app="report" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Report</button></div>
+    <div class="mid"><span class="lbl c"><svg class="ic" aria-hidden="true"><use href="#i-signal"/></svg> Archive loaded · <span id="dsv"></span></span></div>
+    <button class="btn mobile-only sheet-rail" id="openRail" type="button"><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg><span id="openRailT">Contact sheet</span></button>
+    <button class="btn mobile-only" id="openDos" type="button" aria-label="Dossier"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg><span id="openDosT">Dossier</span></button>
+    <span class="lbl a deskid" style="margin-left:auto"><svg class="ic" aria-hidden="true"><use href="#i-monitor"/></svg> Desk 01</span>
   </header>
 
   <aside id="rail" aria-label="Evidence rail">
-    <h2><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg>Collection index</h2>
-    <div>
+    <h2 class="obs-only"><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg>Collection index</h2>
+    <div class="obs-only">
       <div class="lbl" id="obsNo">Observation 0001</div>
       <div class="obs-title" id="obsTitle">National Advisory Committee for Aeronautics transfer</div>
     </div>
-    <div class="obs-tabs" id="obsTabs" role="group" aria-label="Choose observation"></div>
-    <div id="slots" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="obs-tabs obs-only" id="obsTabs" role="group" aria-label="Choose observation"></div>
+    <div id="slots" class="obs-only" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="sim-only" style="display:flex;flex-direction:column;gap:12px">
+      <h2><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>Operations</h2>
+      <div id="simMission"></div>
+      <div><div class="lbl" style="margin-bottom:6px">Resources collected</div><ul id="simRes"></ul></div>
+      <div><div class="lbl" style="margin-bottom:6px">Alerts</div><ul id="simAlerts"></ul></div>
+    </div>
+    <div class="rep-only" style="display:flex;flex-direction:column;gap:10px">
+      <h2><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Storyboards</h2>
+      <div class="lbl">Pick what the card shows</div>
+      <div id="repList"></div>
+    </div>
     <div class="exhibit">
       <h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-lens"/></svg>Material exhibit</h2>
       <button class="row" id="exhibitBtn" type="button" aria-label="Open material exhibit P-001">
@@ -252,34 +350,65 @@ footer .r{margin-left:auto;color:var(--cyan)}
         <span style="display:flex;flex-direction:column;gap:2px"><span class="big mono">P-001</span><span class="lbl">5× crop</span><span class="lbl">RGB · 1:1 source</span></span>
       </button>
       <div class="lbl">Object class</div><div class="big">One pellet</div>
-      <div class="lbl">Historical effect</div><div style="color:var(--amber);font:400 12.5px var(--f-mono)">None recorded</div>
+      <div class="lbl">Historical effect</div><div style="color:var(--amber);font:400 12.5px var(--f-mono)">None recorded</div><div class="lbl">Chain of custody</div><div style="color:var(--ink-2);font:400 12px var(--f-mono)">Unremarkable</div>
     </div>
   </aside>
 
   <main id="center">
-    <div class="tabs"><div class="seg" role="tablist" aria-label="Workspaces">
+    <div class="tabs obs-only"><div class="seg" role="tablist" aria-label="Workspaces">
       <button role="tab" aria-selected="true" data-tab="arena" id="tab-arena"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg>Arena</button>
       <button role="tab" aria-selected="false" data-tab="entities" id="tab-entities"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>Entities</button>
       <button role="tab" aria-selected="false" data-tab="lineage" id="tab-lineage"><svg class="ic" aria-hidden="true"><use href="#i-branch"/></svg>Lineage</button>
       <button role="tab" aria-selected="false" data-tab="records" id="tab-records"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Records</button></div>
-      <span class="sp"></span><div class="seg" id="tour" role="group" aria-label="Choose tour"><button type="button" data-tour="full" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-history"/></svg>Full history<span class="yrs">&nbsp;1775–2026</span></button><button type="button" data-tour="slice" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Reviewed slice<span class="yrs">&nbsp;1958–1977</span></button></div>
+      <span class="sp"></span><button type="button" id="layersBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="layersMenu"><svg class="ic" aria-hidden="true"><use href="#i-frames"/></svg>Layers</button><div class="seg" id="tour" role="group" aria-label="Choose tour"><button type="button" data-tour="full" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-history"/></svg>Full history<span class="yrs">&nbsp;1775–2026</span></button><button type="button" data-tour="slice" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Reviewed slice<span class="yrs">&nbsp;1958–1977</span></button></div>
     </div>
     <div id="stage">
       <canvas id="arena" tabindex="0" aria-label="Arena feed. Space plays or pauses, arrow keys step events."></canvas>
-      <div class="chip"><svg class="ic" aria-hidden="true"><use href="#i-aperture"/></svg>IMAGERY &nbsp;/&nbsp; CELLULAR</div>
-      <div class="datestamp"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="stamp"></span></div>
-      <div class="notice" id="notice" hidden>
+      <div class="chip obs-only"><svg class="ic" aria-hidden="true"><use href="#i-aperture"/></svg>IMAGERY &nbsp;/&nbsp; CELLULAR</div>
+      <div class="datestamp obs-only"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><span id="stamp"></span></div>
+      <div class="notice obs-only" id="notice" hidden>
         <div class="top"><span class="lbl" style="display:inline-flex;gap:6px;align-items:center"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg><span id="noticeWhen">Elsewhere</span></span><button class="x" id="noticeStay" type="button"><svg class="ic sm" aria-hidden="true"><use href="#i-close"/></svg><span id="noticeStayT">Stay</span></button></div>
         <button class="watch" id="noticeWatch" type="button"><svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg><span id="noticeText">Watch the Atomic Energy Commission split</span><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></button>
         <div class="more" id="noticeMore" hidden></div>
       </div>
-      <div class="card" id="pinEnd" hidden></div>
-      <div id="start"><button type="button" id="startBtn"><span class="tri"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>Play history</button></div>
+      <div class="card obs-only" id="pinEnd" hidden></div>
+      <div id="coldTop" class="obs-only" hidden>HISTORICAL EVENT / REVIEWED RECORD · 1958 / FEATURED EVENT</div>
+      <button type="button" class="btn obs-only" id="coldSkip" hidden><svg class="ic" aria-hidden="true"><use href="#i-skip"/></svg>Skip intro</button>
+      <div id="cold" class="obs-only" hidden role="dialog" aria-labelledby="coldT"></div>
+      <div id="start" class="obs-only"><button type="button" id="startBtn"><span class="tri"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>Play history</button></div>
       <section class="ws" id="ws-entities" hidden></section>
       <section class="ws" id="ws-lineage" hidden></section>
       <section class="ws" id="ws-records" hidden></section>
+      <div id="simBanner" class="sim-only"><span class="long">EXPERIMENTAL / </span>FICTIONAL SANDBOX · NOT A HISTORICAL RECORD</div>
+      <div id="simSetup" class="sim-only" hidden></div>
+      <div id="simOver" class="sim-only" hidden></div>
+      <div id="repStage" class="rep-only"><canvas id="repCanvas" width="1600" height="900" aria-label="Briefing card preview"></canvas></div>
     </div>
-    <div id="transport">
+    <div id="simBar" class="sim-only">
+      <div id="simAbil" role="group" aria-label="Abilities">
+        <button type="button" data-a="1" title="Move 30% of your capacity into a temporary satellite that collects resources and returns. Needs capacity 24."><span class="k">1 · Q</span><b>Task Force</b><span class="cd">ready</span></button>
+        <button type="button" data-a="2" title="Recall the task force with everything it collected, or turn 2 staffing into 6 capacity."><span class="k">2 · E</span><b>Transfer Functions</b><span class="cd">ready</span></button>
+        <button type="button" data-a="3" title="After a 2 second comment period, absorb the nearest smaller rival in the dashed ring. Raises oversight exposure."><span class="k">3 · R</span><b>Reorganization Plan</b><span class="cd">ready</span></button>
+      </div>
+      <span class="vsep"></span>
+      <div class="tp"><button type="button" id="simPause" class="play" style="width:auto;padding:0 12px"><svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg><span>Pause</span></button></div>
+      <button type="button" class="btn" id="simRestart"><svg class="ic" aria-hidden="true"><use href="#i-replay"/></svg>Restart</button>
+      <button type="button" class="btn" id="simNew"><svg class="ic" aria-hidden="true"><use href="#i-route"/></svg>New session</button>
+    </div>
+    <div id="simSess" class="sim-only">
+      <div class="tl-head"><h3>Session timeline</h3><span class="lbl"><span id="simClock"></span> · <span id="simSeed"></span> · red marks are oversight hearings</span></div>
+      <div id="simTl"></div>
+      <div class="lbl">Fictional game clock. Not 1775–2026. Steer with the pointer, a finger, or WASD.</div>
+    </div>
+    <div id="repBar" class="rep-only">
+      <select id="repStory" aria-label="Story"></select>
+      <div class="seg" id="repPhase" role="group" aria-label="Keyframe"><button type="button" data-v="before">Before</button><button type="button" data-v="contact">Contact</button><button type="button" data-v="after">After</button></div>
+      <div class="seg" id="repFmt" role="group" aria-label="Format"><button type="button" data-v="landscape">16:9</button><button type="button" data-v="vertical">9:16</button></div>
+      <button type="button" id="repDesk" aria-pressed="true">Desk commentary</button>
+      <button type="button" class="btn amber" id="repExport"><svg class="ic" aria-hidden="true"><use href="#i-external"/></svg>Export PNG</button>
+      <button type="button" class="btn" id="repCopy"><svg class="ic" aria-hidden="true"><use href="#i-route"/></svg><span>Copy link</span></button>
+    </div>
+    <div id="transport" class="obs-only">
       <div id="owner"></div>
       <span class="vsep"></span>
       <div class="playhead"><span class="lbl">Archive playhead</span><span class="yr" id="yr">1958</span><span class="full" id="fulldate"></span></div>
@@ -301,15 +430,20 @@ footer .r{margin-left:auto;color:var(--cyan)}
         </div></div>
       <button type="button" id="replay"><svg class="ic" aria-hidden="true"><use href="#i-replay"/></svg>REPLAY</button>
     </div>
-    <div id="timeline">
+    <div id="timeline" class="obs-only">
       <div class="tl-head"><h3>Event timeline</h3><span class="lbl" id="tlNote">3 reviewed records · dates linear</span></div>
       <div id="tl" role="slider" tabindex="0" aria-label="Historical date" aria-valuemin="1958" aria-valuemax="1978"></div>
-      <div class="onrec"><span class="lbl a" style="display:inline-flex;gap:6px;align-items:center"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>On record</span><span class="t" id="onrec" aria-live="polite"></span><span class="ph-tag" id="phaseTag"></span></div>
+      <div class="onrec"><span class="lbl a" style="display:inline-flex;gap:6px;align-items:center"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>On record</span><span class="t" id="onrec" aria-live="polite"></span><span class="ph-tag" id="phaseTag"></span><span class="rv" id="rvTag" hidden></span></div>
+      <div class="desk" id="desk" hidden><span class="lbl">Desk commentary · editorial, not a sourced fact</span><i id="deskT"></i></div>
     </div>
   </main>
 
   <aside id="dossier" aria-label="Entity dossier">
-    <div class="dsec">
+    <div class="dsec sim-only"><div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg>Agency profile</h2><span class="lbl" style="color:var(--split)">Fictional</span></div><div id="simProfile"></div>
+      <div class="btnrow"><button class="btn" type="button" id="simBack"><svg class="ic" aria-hidden="true"><use href="#i-history"/></svg>Return to the historical record</button></div></div>
+    <div class="dsec sim-only" style="border-bottom:0"><div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>Rivals</h2><span class="lbl">Utility AI state</span></div><table id="simRivals"></table></div>
+    <div class="dsec rep-only" style="border-bottom:0"><div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>What this card says</h2><span class="lbl">One source of truth</span></div><div id="repFacts"></div></div>
+    <div class="dsec obs-only">
       <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-idcard"/></svg>Entity dossier</h2><span class="lbl" id="selMode">Auto select</span></div>
       <div class="ent"><canvas id="emb" width="112" height="112"></canvas><div><div class="lbl">Selected institution</div><div class="short" id="dShort">National Aeronautics and Space Administration</div></div></div>
       <div class="long" id="dLong"></div>
@@ -317,12 +451,12 @@ footer .r{margin-left:auto;color:var(--cyan)}
       <p class="expl" id="dExpl"></p>
       <div class="btnrow" id="dBtns"></div>
     </div>
-    <div class="dsec" id="lineage">
+    <div class="dsec obs-only" id="lineage">
       <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-branch"/></svg>Lineage trace</h2><span class="lbl" id="linNote"></span></div>
       <svg id="linSvg" viewBox="0 0 320 96" role="group" aria-label="Lineage trace"></svg>
       <div class="expl" id="linText"></div>
     </div>
-    <div class="dsec">
+    <div class="dsec obs-only">
       <div class="dhead"><h2 style="color:var(--cyan)"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg>Arena overview</h2><span class="lbl">Camera footprint</span></div>
       <canvas id="mini" width="640" height="240" aria-label="Minimap. Click to look at a location."></canvas>
     </div>
@@ -334,6 +468,11 @@ footer .r{margin-left:auto;color:var(--cyan)}
 
   <footer><span>Workspace / Federal</span><span>Statecraft / Historical entity observation</span><span id="ftds"></span><span class="r">Sensor return / Cellular imagery</span></footer>
   <div id="drawer" hidden role="dialog" aria-modal="false" aria-labelledby="drawerTitle"></div>
+  <div id="layersMenu" role="menu" aria-label="Arena layers" hidden><div class="hd">ARENA LAYERS · FULL HISTORY</div>
+    <button type="button" role="menuitemcheckbox" data-layer="families" aria-checked="true"><span class="bx"></span><span>Institution families</span><span class="d">At wide zoom, group units under their recorded parent. A visual grouping, not a merger.</span></button>
+    <button type="button" role="menuitemcheckbox" data-layer="uncertain" aria-checked="false"><span class="bx"></span><span>Uncertainty rims</span><span class="d">Dashed amber: start year is a records span or unsourced. Dotted: low confidence.</span></button>
+    <button type="button" role="menuitemcheckbox" data-layer="showQ" aria-checked="false"><span class="bx"></span><span>Quarantined entries</span><span class="d">Show 16 record collections and non-federal governments the census lists. Hidden by default.</span></button>
+  </div>
 </div>
 
 <script>
@@ -797,7 +936,7 @@ function followTarget(k, T, W, H) {
 }
 
 /* ================= VIEWER STATE ================= */
-const S = { tour: "full", Y: 1774.5, pinSinceY: 1774.5, capturing: false, hcells: [], T: 0, playing: false, speed: 1, mode: "auto", pin: null, returnPin: null, inspect: null, tab: "arena", prevTab: "arena",
+const S = { app: "observe", cold: false, layers: { families: true, uncertain: false }, showQ: false, tour: "full", Y: 1775, pinSinceY: 1775, capturing: false, hcells: [], T: 0, playing: false, speed: 1, mode: "auto", pin: null, returnPin: null, inspect: null, tab: "arena", prevTab: "arena",
   pinSinceT: 0, dismissed: new Set(), pinEnd: null, ended: false, scrubbing: false, railPick: null, started: false };
 const cam = { x: 900, y: 900, z: 0.6 }; let snapCam = true;
 const T0 = performance.now();
@@ -1073,7 +1212,7 @@ function renderDossier() {
   g.save(); g.translate(56, 56); glyph(g, e.glyph, 58, shade(e.color, -0.55)); g.restore();
   let kv = `<dt>Status</dt><dd><span class="tag ${st.tag}">${st.s}</span></dd>`;
   if (e.ctx) kv += `<dt>Census ID</dt><dd class="mono">${e.id}</dd><dt>Note</dt><dd>Shown for scale and context. Excluded from rankings and records.</dd>`;
-  else kv += `<dt>Dates</dt><dd>${e.dates}</dd><dt>Parent</dt><dd>${e.parent}</dd><dt>Mass</dt><dd>${massAt(k, ms) || "—"} <span class="lbl">in this dataset</span></dd><dt>Census ID</dt><dd class="mono">${e.id}</dd>`;
+  else kv += `<dt>Dates</dt><dd>${e.dates}</dd><dt>Parent</dt><dd>${e.parent}</dd><dt>Visual mass</dt><dd>${massAt(k, ms) || "—"} <span class="lbl" title="Relative visual size is an artistic function of dataset classification and included relationships. It does not represent staff, budget, jurisdiction, legal authority, or public impact.">model units ⓘ</span></dd><dt>Census ID</dt><dd class="mono">${e.id}</dd>`;
   $("dKv").innerHTML = kv;
   $("dExpl").textContent = e.ctx ? "" : e.expl;
   let b = "";
@@ -1265,8 +1404,9 @@ $("exhibitBtn").addEventListener("click", () => {
   const toWorld = (sx, sy) => [cam.x + (sx - AW / 2) / cam.z, cam.y + (sy - AH / 2) / cam.z];
   const rel = e => { const r = arena.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   function enterFree(why) { if (S.mode !== "free") { if (S.mode === "follow") S.returnPin = S.pin; S.pin = null; S.mode = "free"; log(why); } }
-  arena.addEventListener("pointerdown", e => { arena.setPointerCapture(e.pointerId); pts.set(e.pointerId, rel(e)); down = { p: rel(e), cam: { ...cam } }; moved = false; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z: cam.z }; } });
+  arena.addEventListener("pointerdown", e => { if (S.app !== "observe") return; arena.setPointerCapture(e.pointerId); pts.set(e.pointerId, rel(e)); down = { p: rel(e), cam: { ...cam } }; moved = false; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z: cam.z }; } });
   arena.addEventListener("pointermove", e => {
+    if (S.app !== "observe") return;
     if (!pts.has(e.pointerId)) return; const p = rel(e); pts.set(e.pointerId, p);
     if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; const w = toWorld(...mid); cam.z = Math.max(zMin(), Math.min(3, pinch.z * d / pinch.d)); cam.x = w[0] - (mid[0] - AW / 2) / cam.z; cam.y = w[1] - (mid[1] - AH / 2) / cam.z; enterFree("Pinch zoom · free view"); moved = true; return; }
     if (!down) return; const dx = p[0] - down.p[0], dy = p[1] - down.p[1];
@@ -1274,12 +1414,14 @@ $("exhibitBtn").addEventListener("click", () => {
     if (moved) { cam.x = down.cam.x - (p[0] - down.p[0]) / cam.z; cam.y = down.cam.y - (p[1] - down.p[1]) / cam.z; }
   });
   const up = e => {
+    if (S.app !== "observe") return;
     pts.delete(e.pointerId); if (pts.size < 2) pinch = null; arena.classList.remove("dragging");
     if (down && !moved && pts.size === 0) clickAt(...down.p);
     if (pts.size === 0) down = null;
   };
   arena.addEventListener("pointerup", up); arena.addEventListener("pointercancel", up);
   arena.addEventListener("wheel", e => {
+    if (S.app !== "observe") { e.preventDefault(); return; }
     e.preventDefault(); const p = rel(e), w = toWorld(...p);
     enterFree("Zoom · free view");
     cam.z = Math.max(zMin(), Math.min(3, cam.z * Math.exp(-e.deltaY * 0.0015)));
@@ -1322,6 +1464,7 @@ function speedMenu(open) {
 function setSpeed(v) {
   if (v === S.speed) return; const wasRev = S.speed < 0; S.speed = v;
   log("Speed " + (v < 0 ? "−" + Math.abs(v) : v) + "×" + (v < 0 ? " · reverse" : v >= 10 ? " · fast-forward" : v < 0.5 ? " · comically slow" : ""));
+  if (v < 0 && !wasRev) log("Reversal request accepted · time has been moved backward. No paperwork required.", true);
   if (v < 0 && !wasRev) S.ended = false;
 }
 $("speedBtn").addEventListener("click", () => speedMenu($("speedMenu").hidden));
@@ -1339,6 +1482,7 @@ function tourLabels() {
   $("tlNote").textContent = full ? `${HB.length} marked events · founded per year · draft census` : "3 reviewed records · dates linear";
   $("speedNorm").textContent = full ? "Normal · one year per second" : "Normal";
   document.querySelectorAll("[data-tour]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tour === S.tour)));
+  $("layersBtn").hidden = !full;
 }
 function setTour(t, quiet) {
   if (t === S.tour) return;
@@ -1352,14 +1496,19 @@ function setTour(t, quiet) {
 $("tour").addEventListener("click", e => { const b = e.target.closest("[data-tour]"); if (b) setTour(b.dataset.tour); });
 $("openRail").addEventListener("click", () => $("rail").classList.toggle("open"));
 $("openDos").addEventListener("click", () => $("dossier").classList.toggle("open"));
+document.addEventListener("keyup", e => { if (S.app === "simulate") simKey(e, false); });
 document.addEventListener("keydown", e => {
   const tag = (e.target.tagName || "").toLowerCase();
+  if (S.app === "simulate" && simKey(e, true)) return;
+  if (S.app !== "observe") { if (e.key === "Escape") { if (!$("layersMenu").hidden) layersMenu(false); else if ($("rail").classList.contains("open")) $("rail").classList.remove("open"); else if ($("dossier").classList.contains("open")) $("dossier").classList.remove("open"); } return; }
   if (tag === "input" || tag === "textarea") { if (e.key === "Escape") e.target.blur(); return; }
   if (e.key === " " && (e.target === arena || e.target === document.body)) { e.preventDefault(); setPlaying(!S.playing); }
   else if (e.key === "ArrowRight" && e.target !== $("tl")) { e.preventDefault(); stepEvent(1); }
   else if (e.key === "ArrowLeft" && e.target !== $("tl")) { e.preventDefault(); stepEvent(-1); }
   else if (e.key === "Escape") {
     if (!$("speedMenu").hidden) speedMenu(false);
+    else if (!$("layersMenu").hidden) layersMenu(false);
+    else if (S.cold && !$("cold").hidden) coldAction("explore");
     else if (!$("drawer").hidden) closeDrawer();
     else if (S.tab !== "arena") setTab("arena");
     else if (S.inspect) { S.inspect = null; log("Inspection closed"); }
@@ -1379,6 +1528,7 @@ function readouts(ms) {
   $("speedMenu").querySelectorAll("[data-speed]").forEach(b => { const on = String(+b.dataset.speed === S.speed); if (b.getAttribute("aria-checked") !== on) b.setAttribute("aria-checked", on); });
   $("replay").classList.toggle("hot", S.ended);
   const r = onRecordText(); if ($("onrec").textContent !== r.t) $("onrec").textContent = r.t; $("phaseTag").textContent = r.ph;
+  renderReview();
   renderOwner(); renderNotice(); renderPinEnd(); renderRail(); renderDossier(); renderTimeline(); renderWorkspace();
 }
 function tickFull(dt) {
@@ -1406,17 +1556,20 @@ function tickFull(dt) {
     else { const k = 1 - Math.exp(-dt * (Math.abs(S.speed) >= 10 && S.playing ? 7 : 4.2)); cam.x += (target.x - cam.x) * k; cam.y += (target.y - cam.y) * k; cam.z = Math.exp(Math.log(cam.z) + (Math.log(target.z) - Math.log(cam.z)) * k); }
   }
   actx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  renderFull(actx, AW, AH, cam, S.Y, cells, { pin: S.pin });
+  S.rstats = {}; renderFull(actx, AW, AH, cam, S.Y, cells, { pin: S.pin, stats: S.rstats });
   renderMini(cells);
   readouts(yToMs(S.Y));
 }
 function tick(now) {
   const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+  if (S.app === "simulate") { simFrame(dt); requestAnimationFrame(tick); return; }
+  if (S.app === "report") { renderReportUI(); requestAnimationFrame(tick); return; }
   if (S.tour === "full") { tickFull(dt); requestAnimationFrame(tick); return; }
   if (S.playing && !S.scrubbing) {
     const prev = S.T; S.T = Math.max(0, Math.min(TEND, S.T + dt * minHoldRate(S.T, S.speed)));
     for (const ev of EVENTS) if (prev < ev.C && S.T >= ev.C) log(ev.short + " registered · " + fmt(ev.eff), true);
     if (S.pin && ENT[S.pin]) { const e = ENT[S.pin]; if (e.until) { const ev = EVI[e.until]; if (prev < ev.CE && S.T >= ev.CE) { S.playing = false; S.pinEnd = { key: S.pin }; log(NM(S.pin) + " ended while pinned · holding", true); } } }
+    if (S.cold && S.speed > 0 && prev < EVENTS[0].S && S.T >= EVENTS[0].S) { S.playing = false; showCold(); }
     if (S.speed > 0 && S.T >= TEND) { S.playing = false; S.ended = true; log("Tour complete · result held", true); }
     if (S.speed < 0) { S.ended = false; if (S.T <= 0) { S.playing = false; log("Rewind complete · start of tour", true); } }
     lastT = S.T;
@@ -1443,6 +1596,80 @@ function tick(now) {
 
 /*@@HIST@@*/
 /*@@FULL@@*/
+/*@@SIM@@*/
+/*@@REPORT@@*/
+/* ================= REVIEW STATUS + DESK COMMENTARY (two separate channels) ================= */
+const SLICE_DESK = { "ev-slice-001": "Administrative appetite: significant.", "ev-slice-002": "The committee has become two committees.", "ev-slice-003": "Energy consolidated. Entropy pending review." };
+let reviewSig = "";
+function renderReview() {
+  let rv = null, desk = "";
+  if (S.tour === "slice") {
+    const i = currentEventIndex(S.T); rv = "HISTORICAL / REVIEWED";
+    if (i >= 0) { const ev = EVENTS[i], nx = EVENTS[i + 1]; if (S.T >= ev.CE && (!nx || S.T < nx.A)) desk = SLICE_DESK[ev.id] || ""; }
+    if (S.cold) { const ev = EVENTS[0], el = $("coldTop"), hot = S.T >= ev.C; el.textContent = hot ? "INSTITUTIONAL TRANSFER DETECTED · EFFECTIVE " + fmt(ev.eff).toUpperCase() : "HISTORICAL EVENT / REVIEWED RECORD · 1958 / FEATURED EVENT"; el.classList.toggle("hot", hot); }
+  } else {
+    const i = hBeatIdx(S.Y + LEAD), b = HB[i];
+    if (b) { rv = b.reviewed ? "HISTORICAL / REVIEWED" : "DRAFT / UNCERTAIN"; if (S.Y >= b.t && S.Y < b.t + HOLD + 1.2) desk = deskLineForBeat(b); }
+  }
+  const sig = rv + "|" + desk; if (sig === reviewSig) return; reviewSig = sig;
+  const t = $("rvTag"); t.hidden = !rv; t.textContent = rv || ""; t.className = "rv " + (rv && rv.startsWith("HIST") ? "ok" : "draft");
+  $("desk").hidden = !desk; $("deskT").textContent = desk;
+}
+/* ================= COLD OPEN: a reviewed 1958 event instead of an empty 1775 ================= */
+function startCold() {
+  S.cold = true; setTour("slice", true); seek(0); S.started = true; $("start").hidden = true; $("coldTop").hidden = false; $("coldSkip").hidden = false;
+  log("Featured event · reviewed record · 1958", true);
+  if (reduced) { seek(EVENTS[0].S); showCold(); } else setPlaying(true, false);
+}
+function showCold() {
+  const ev = EVENTS[0], el = $("cold"); el.hidden = false; $("coldSkip").hidden = true;
+  el.innerHTML = `<span class="lbl c">Historical event / reviewed record · effective ${fmt(ev.eff)}</span><span class="t" id="coldT">${ev.title}</span>
+    <span class="expl">${reduced ? "Static keyframe (reduced motion). Before: two cells, the National Advisory Committee for Aeronautics and the new National Aeronautics and Space Administration. After 1 Oct 1958: one cell, the National Aeronautics and Space Administration, with the committee's functions. " : ""}Source: ${ev.authority}.</span>
+    <div class="deskl"><span class="lbl">Desk commentary · editorial, not a sourced fact</span><i>Administrative appetite: significant.</i></div>
+    <div class="btnrow"><button class="btn" type="button" data-cold="replay">${ic("replay")}Replay event</button><button class="btn amber" type="button" data-cold="explore">${ic("history")}Explore history</button><button class="btn" type="button" data-cold="sim" style="opacity:.8">${ic("target")}Enter simulation</button></div>
+    <span class="tip">Tip: click a cell to follow it · scroll or pinch to zoom · drag to look around.</span>`;
+  el.querySelector('[data-cold="explore"]').focus({ preventScroll: true });
+  log("Featured event complete · choose: replay, explore, or simulate", true);
+}
+function endCold() { S.cold = false; $("cold").hidden = true; $("coldTop").hidden = true; $("coldSkip").hidden = true; reviewSig = ""; }
+function coldAction(a) {
+  if (a === "replay") { $("cold").hidden = true; $("coldSkip").hidden = false; seek(0); setPlaying(true, false); log("Replay featured event"); return; }
+  endCold();
+  if (a === "explore") { setTour("full", true); seekY(msToY(EVENTS[0].eff) + 0.003); setPlaying(true, false); log("Explore history · from the featured event, 1 Oct 1958 · Replay starts at 1775"); }
+  else if (a === "sim") setApp("simulate");
+  else if (a === "skip") { setTour("full", true); seekY(FY0); S.started = false; $("start").hidden = false; S.playing = false; log("Intro skipped · full history at 1775"); }
+}
+$("cold").addEventListener("click", e => { const b = e.target.closest("[data-cold]"); if (b) coldAction(b.dataset.cold); });
+$("coldSkip").addEventListener("click", () => coldAction("skip"));
+/* ================= LAYERS ================= */
+function layersMenu(open) {
+  const m = $("layersMenu"), b = $("layersBtn");
+  if (open) { const r = b.getBoundingClientRect(); m.hidden = false; m.style.left = Math.max(8, Math.min(innerWidth - m.offsetWidth - 8, r.left)) + "px"; m.style.top = (r.bottom + 6) + "px"; b.setAttribute("aria-expanded", "true"); m.querySelector("button").focus(); }
+  else { m.hidden = true; b.setAttribute("aria-expanded", "false"); }
+}
+function setLayer(k, v) {
+  if (k === "showQ") S.showQ = v; else S.layers[k] = v;
+  document.querySelectorAll("#layersMenu [data-layer]").forEach(b => b.setAttribute("aria-checked", String(b.dataset.layer === "showQ" ? S.showQ : !!S.layers[b.dataset.layer])));
+  hDosSig = ""; hWsSig = ""; log("Layer · " + { families: "Institution families", uncertain: "Uncertainty rims", showQ: "Quarantined entries" }[k] + (v ? " on" : " off"));
+}
+$("layersBtn").addEventListener("click", () => layersMenu($("layersMenu").hidden));
+$("layersMenu").addEventListener("click", e => { const b = e.target.closest("[data-layer]"); if (!b) return; const k = b.dataset.layer; setLayer(k, !(k === "showQ" ? S.showQ : S.layers[k])); });
+$("layersMenu").addEventListener("keydown", e => { const items = [...$("layersMenu").querySelectorAll("button")], i = items.indexOf(document.activeElement); if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); e.stopPropagation(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); } else if (e.key === "Escape") { e.stopPropagation(); layersMenu(false); $("layersBtn").focus(); } });
+document.addEventListener("pointerdown", e => { if (!$("layersMenu").hidden && !e.target.closest("#layersMenu") && !e.target.closest("#layersBtn")) layersMenu(false); });
+/* ================= MODES: Observe | Simulate | Report ================= */
+function setApp(m, quiet) {
+  if (m === S.app) return; S.app = m; document.body.dataset.app = m;
+  document.querySelectorAll("#modes [data-app]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.app === m)));
+  speedMenu(false); layersMenu(false); $("drawer").hidden = true;
+  if (m !== "observe") { if (S.cold) endCold(); S.playing = false; }
+  $("openRailT").textContent = m === "simulate" ? "Operations" : m === "report" ? "Storyboards" : "Contact sheet";
+  $("openDosT").textContent = m === "simulate" ? "Profile" : m === "report" ? "Facts" : "Dossier";
+  if (m === "simulate") { if (!SIMV.W) simSetupCard(); SIMV.sig = ""; }
+  if (m === "report") renderReportUI(true);
+  if (m === "observe") { snapCam = true; railSig = ""; dosSig = ""; hDosSig = ""; reviewSig = ""; }
+  if (!quiet) log("Mode · " + { observe: "Observe · historical archive", simulate: "Simulate · fictional sandbox", report: "Report · briefing cards" }[m]);
+}
+$("modes").addEventListener("click", e => { const b = e.target.closest("[data-app]"); if (b) setApp(b.dataset.app); });
 /* ================= TEST / INSPECTION HOOK (read-only) ================= */
 window.FC = {
   state() {
@@ -1468,14 +1695,33 @@ window.FC = {
     keyOf: id => { const u = HBYID.get(id); return u ? u.key : null; },
     snapshot(y) { return hCells(y).map(c => c.key + ":" + Math.round(c.x) + "," + Math.round(c.y) + "," + Math.round(c.r)).join(";"); },
     aliveIds: y => hCells(y).map(c => c.u.id), beats: () => HB.map(b => ({ i: b.i, t: b.t, title: b.title, reviewed: b.reviewed })), FY0, FY1, seekDate: s => seekY(msToY(D(s))), seekY: y => seekY(y),
-    screenOf: k => window.__fcScreenOfFull(k), meta: HIST.meta
+    screenOf: k => window.__fcScreenOfFull(k), meta: HIST.meta, stats: () => ({ ...S.rstats, z: +cam.z.toFixed(4) }), setCam: c => { Object.assign(cam, c); S.mode = "free"; }
   },
+  app: () => S.app, setApp: m => setApp(m),
+  cold: () => ({ cold: S.cold, card: !$("cold").hidden, top: $("coldTop").hidden ? null : $("coldTop").textContent, tour: S.tour, T: +S.T.toFixed(3), playing: S.playing }), coldAction: a => coldAction(a),
+  review: () => ({ tag: $("rvTag").hidden ? null : $("rvTag").textContent, desk: $("desk").hidden ? null : $("deskT").textContent }),
+  layers: () => ({ ...S.layers, showQ: S.showQ }), setLayer: (k, v) => setLayer(k, v),
+  sim: { V: SIM_V, scenarios: SCENARIOS.map(s => s.id), archetypes: ARCHETYPES.map(a => a.id), run(meta, log, ticks) { const W = simReplay(meta, log, ticks); return { hash: simHash(W), tick: W.tick, over: W.over, player: (({ x, y, mass, score, alive }) => ({ x, y, mass, score, alive }))(W.cells.find(c => c.id === W.player)) }; },
+    start: meta => simStart(meta), live() { const W = SIMV.W; if (!W) return null; const P = W.cells.find(c => c.id === W.player); return { tick: W.tick, hash: simHash(W), meta: SIMV.meta, log: SIMV.log.slice(), over: W.over, paused: SIMV.paused, setup: SIMV.setup, player: { x: P.x, y: P.y, mass: P.mass, score: P.score, alive: P.alive, cd: P.cd.slice() }, rivals: W.cells.filter(c => c.alive && c.npc).length, states: [...new Set(W.cells.filter(c => c.alive && c.npc).map(c => c.state))], tf: W.cells.some(c => c.alive && c.owner === P.id), alerts: W.alerts.map(a => a.text) }; },
+    act: a => SIMV.pendingA.push(a), pause: v => { SIMV.paused = v; } },
+  report: { model: () => { const m = reportModel(); return m && { kind: m.kind, status: m.status, code: m.code, title: m.title, date: m.date, desk: m.desk, link: m.link, caveat: m.caveat }; }, set: o => { Object.assign(REPORT, o); renderReportUI(true); }, size: () => [$("repCanvas").width, $("repCanvas").height], sources: () => reportSources().map(s => s.id) },
   dateToT: s => TAt(D(s)), _seek: t => seek(t), _auto: (t, W, H) => autoTarget(t, W, H), pellet: () => P001, captureKeys: () => [...capCache.keys()]
 };
 
 tourLabels();
 log("Feed acquired · " + DATASET, true);
-resize(); setTab("arena", true); drawExhibitThumb();
+resize(); setTab("arena", true); drawExhibitThumb(); simWire(); reportWire(); document.body.dataset.app = "observe";
+/* deep links: ?mode=observe&date=1958-10-01&entity=u-rg255 · ?story=naca-nasa · ?mode=simulate&scenario=jurisdiction-grab&seed=12345 · ?mode=report&story=naca-nasa&format=vertical */
+(() => {
+  const Q = new URLSearchParams(location.search), deep = ["mode", "date", "entity", "story", "scenario", "seed", "format"].some(k => Q.has(k));
+  const mode = Q.get("mode"), story = STORIES.find(s => s.id === Q.get("story"));
+  if (mode === "simulate") { setApp("simulate", true); if (Q.has("seed") || Q.has("scenario")) simStart({ scenario: Q.get("scenario") || SCENARIOS[0].id, archetype: Q.get("agency") || ARCHETYPES[0].id, seed: parseInt(Q.get("seed"), 10) || 12345 }); return; }
+  if (mode === "report") { if (story) REPORT.story = story.id; if (Q.get("format") === "vertical") REPORT.format = "vertical"; if (["before", "contact", "after"].includes(Q.get("phase"))) REPORT.phase = Q.get("phase"); setApp("report", true); return; }
+  if (story) { setTour("slice", true); const ev = EVI[story.ev]; seek(Math.max(0, ev.A - 0.5)); setPlaying(true, false); log("Opened story link · " + ev.short); return; }
+  if (Q.has("date")) { const ms = D(Q.get("date")); if (isFinite(ms)) { seekY(msToY(ms) + 0.002); S.started = true; $("start").hidden = true; log("Opened date link · " + fmt(ms)); } }
+  if (Q.has("entity")) { const u = HBYID.get(Q.get("entity")); if (u) { if (!Q.has("date")) seekY(Math.max(u.t0 + 0.4, FY0)); if (hAlive(u, S.Y)) follow(u.key, "opened from link"); else S.inspect = u.key; } }
+  if (!deep && Q.get("intro") !== "0") startCold();
+})();
 if (document.fonts) document.fonts.ready.then(() => { WRAP.clear(); drawExhibitThumb(); });
 requestAnimationFrame(t => { lastFrame = t; tick(t); });
 </script>

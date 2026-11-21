@@ -16,7 +16,7 @@ async function tlDrag(p, fromDate, toDate) {
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 1472, height: 860 } });
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(String(e)));
-  const url = 'file://' + __dirname + '/../index.html';
+  const url = 'file://' + __dirname + '/../index.html?intro=0'; /* the cold open is covered in blueprint.test.js */
   fs.mkdirSync('shots/e2e', { recursive: true });
 
   /* ---------------- RUN A: hands-free ---------------- */
@@ -42,7 +42,7 @@ async function tlDrag(p, fromDate, toDate) {
   check('A: each event registered exactly once', regs.length === 3, regs.join(' | '));
   check('A: dossier follows the director (NASA→AEC/ERDA→DOE)', samples[2].dossier === 'NASA' && samples[3].dossier === 'AEC' && samples[5].dossier === 'ERDA' && samples[6].dossier === 'ERDA' && endA.dossier === 'DOE', samples.map(s => s.dossier).join(','));
   check('A: Replay offered at end', await p.evaluate(() => document.getElementById('replay').classList.contains('hot')));
-  check('A: 9 evidence captures generated from the simulation', (await p.evaluate(() => FC.captureKeys().length)) === 9);
+  check('A: 9 evidence captures generated from the simulation', (await p.evaluate(() => FC.captureKeys().filter(k => k.includes('/slice-')).length)) === 9 /* the full tour now opens at 1775.0 and may pre-file its first frame before the tour switch */);
   say('A log:', JSON.stringify(endA.log));
 
   /* ---------------- RUN B: take control ---------------- */
@@ -141,11 +141,12 @@ async function tlDrag(p, fromDate, toDate) {
   const setSpeed = async v => { await p.click('#speedBtn'); await p.click(`#speedMenu [data-speed="${v}"]`); };
   await p.goto(url); await p.waitForTimeout(900);
   s = await fs_();
-  check('D: opens on the Full history tour at 1775 with Play history offered', (await p.evaluate(() => FC.tour())) === 'full' && s.Y < 1775 && await p.isVisible('#startBtn'), `Y=${s.Y}`);
+  check('D: opens on the Full history tour at 1775 with Play history offered', (await p.evaluate(() => FC.tour())) === 'full' && s.Y <= 1775 && await p.isVisible('#startBtn'), `Y=${s.Y}`);
   const speeds = await p.evaluate(() => [...document.querySelectorAll('#speedMenu [data-speed]')].map(b => +b.dataset.speed));
   check('D: speed menu offers -1x, 0.1x, 0.5x, 1x, 1.5x, 2x, 25x', speeds.join() === '-1,0.1,0.5,1,1.5,2,25', speeds.join());
   await p.click('#startBtn'); const y0 = (await fs_()).Y; await p.waitForTimeout(2000); s = await fs_();
-  check('D: 1x plays about one year per second, hands-free in Auto tour', s.Y - y0 > 1.2 && s.Y - y0 < 2.4 && s.mode === 'auto' && s.playing, `advanced ${(s.Y - y0).toFixed(2)} yr`);
+  /* history now opens at 1775.0, so the first 2 s include the half-speed hold on the 1775.5 Postal Service beat */
+  check('D: 1x plays about one year per second, hands-free in Auto tour', s.Y - y0 > 0.9 && s.Y - y0 < 2.4 && s.mode === 'auto' && s.playing, `advanced ${(s.Y - y0).toFixed(2)} yr`);
   await setSpeed(25); const trace = []; const tStart = Date.now();
   while (Date.now() - tStart < 20000) { const v = await fs_(); trace.push(v.Y); if (v.ended) break; await p.waitForTimeout(100); }
   s = await fs_();
