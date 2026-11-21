@@ -1,0 +1,60 @@
+== E1: cold open on the reviewed 1958 event
+PASS E1: first load opens the featured reviewed event, not 1775  {"cold":true,"card":false,"top":"HISTORICAL EVENT / REVIEWED RECORD · 1958 / FEATURED EVENT","tour":"slice","T":1.233,"playing":true}
+PASS E1: freezes after the transfer with Replay / Explore / Simulate
+PASS E1: alert reads INSTITUTIONAL TRANSFER DETECTED with the effective date  INSTITUTIONAL TRANSFER DETECTED · EFFECTIVE 1 OCT 1958
+PASS E1: NACA ended and NASA holds it (archive truth unchanged by the intro)
+PASS E1: on-record tag is reviewed; satire is a separate, labelled line
+PASS E1: dossier follows a featured participant  National Aeronautics and Space Administration
+PASS E1: Replay event restarts the featured event  {"cold":true,"card":false,"top":"HISTORICAL EVENT / REVIEWED RECORD · 1958 / FEATURED EVENT","tour":"slice","T":0.417,"playing":true}
+PASS E1: Explore history continues in the full archive from 1 Oct 1958  1958-12-26
+PASS E1: reduced motion shows a static keyframe with a text summary and the same choices
+PASS E1: Skip intro lands on full history at 1775 with Play history
+== E2: provenance, review status, quarantine
+PASS E2: a records-span start reads "records coverage begins", flagged not a founding date  Lands Division
+PASS E2: a year-only start reads "sometime in <year>" (no invented day)
+PASS E2: dossier says Visual mass / model units, never "in this dataset"
+PASS E2: draft units carry a Draft badge
+PASS E2: a unit with no relationships gets no invented family tree
+PASS E2: an unreviewed beat shows DRAFT / UNCERTAIN; a reviewed one shows REVIEWED  DRAFT / UNCERTAIN / HISTORICAL / REVIEWED
+PASS E2: no draft beat ever shows the reviewed tag
+PASS E2: quarantined non-federal / record-collection entries are hidden by default and shown on request  {"a":false,"b":true,"n":16}
+PASS E2: layers are presentation only; snapshot(1977.9) identical after toggling and scrubbing
+PASS E2: header says Archive loaded (not connected)
+== E3: overview clusters and labels
+PASS E3: 2026 wide view draws labelled institution families instead of 800 tiny labels  {"families":13,"smallLabels":25,"z":0.085}
+PASS E3: families dissolve into real cells when zoomed in  {"families":0,"smallLabels":0,"z":0.5}
+PASS E3: the Families layer can be turned off
+PASS E3: Layers menu opens with three toggles
+PASS E3: Escape closes the Layers menu
+== E4: Simulate (fictional sandbox)
+PASS E4: Simulate opens with a scenario / archetype picker and a fictional banner
+PASS E4: archive panels and the 1775–2026 timeline are hidden in Simulate
+PASS E4: keyboard steering moves the player (D held 1.2 s)  1800 -> 2028
+PASS E4: Task Force deploys (moves 30% of capacity into a satellite)  {"x":2058.222661936072,"y":1200,"mass":19.11,"score":3,"alive":true,"cd":[674.4,0,0]}
+PASS E4: Transfer Functions recalls the task force with its gains
+PASS E4: Reorganization Plan resolves after its comment period
+PASS E4: rivals run a utility AI with named states  Claim,Forage,Evade
+PASS E4: replay from (seed, version, scenario, archetype, action log) reproduces the live run exactly  902f04d1 vs 902f04d1 @ 359 ticks, 6 log entries
+PASS E4: same seed + log → same state; a different seed → a different state
+PASS E4: a task force conserves capacity, and a split below capacity 24 creates nothing  {"conserved":true,"denied":true}
+PASS E4: a simulation session leaves the archive untouched
+PASS E4: arrow keys are not hijacked in Observe after leaving Simulate
+== E5: Report cards and export
+PASS E5: report link opens a reviewed story card with status, date, and labelled satire  {"kind":"reviewed","status":"HISTORICAL / REVIEWED RECORD","code":"OBS-0001","title":"National Advisory Committee for Aeronautics incorporated into the National Aeronautics and Space Administration","date":"Effective 1 Oct 1958","desk":"TRANSFER COMPLETE. SPACE REMAINS UNCHANGED.","link":"?mode=report&story=naca-nasa&format=landscape&phase=after","caveat":""}
+PASS E5: Export PNG downloads a 1600×900 PNG  agency-io-naca-nasa-16x9.png
+PASS E5: 9:16 export is 1080×1920  agency-io-naca-nasa-9x16.png
+PASS E5: the DOE card states it is a subset, not the full reorganization  Shows the Energy Research and Development Administration lineage only. Two other agencies also merged into DOE that day; their roles are not yet reviewed.
+PASS E5: an archive-moment card from a draft beat is labelled DRAFT / UNCERTAIN  DRAFT / UNCERTAIN · UNREVIEWED CENSUS RECORD
+PASS E5: simulate link starts the named scenario, seed and archetype
+PASS E5: a finished run becomes a card labelled SIMULATION / FICTIONAL  SIMULATION / FICTIONAL · NOT A HISTORICAL RECORD
+== E6: deep links
+PASS E6: ?date&entity opens the full archive at that date following NASA  {"d":"1958-10-02","pin":"National Aeronautics and Space Administration"}
+PASS E6: ?story=aec-split opens the reviewed slice at the AEC division  T=10.25
+== E7: phone 390×844
+PASS E7: cold fits the phone width and keeps the mode switch on screen  {"sw":390,"w":390,"modes":true}
+PASS E7: sim fits the phone width and keeps the mode switch on screen  {"sw":390,"w":390,"modes":true}
+PASS E7: report fits the phone width and keeps the mode switch on screen  {"sw":390,"w":390,"modes":true}
+PASS E7: report controls are at least 30 px tall on the phone
+PASS no page errors
+
+0 failing checks
